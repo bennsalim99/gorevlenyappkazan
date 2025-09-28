@@ -124,12 +124,10 @@
             flex: 0 0 100%;
             scroll-snap-align: start;
         }
-        .admin-user-row {
-            cursor: pointer;
-            transition: background-color 0.15s;
-        }
+        /* Admin User List */
         .admin-user-row:hover {
             background-color: #374151; /* gray-700 */
+            cursor: pointer;
         }
     </style>
 </head>
@@ -148,9 +146,16 @@
                 </div>
                 <nav>
                     <ul>
-                         <!-- YENİ: OLUŞTURDUĞUM GÖREVLER LİNKİ -->
+                        <!-- YENİ: ANA SAYFA LİNKİ -->
                         <li>
-                            <a href="#" id="my-tasks-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
+                            <a href="#" onclick="window.setView('tasks'); closeSlider(); return false;" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                <span class="ml-3 font-semibold">Ana Sayfa (Aktif Görevler)</span>
+                            </a>
+                        </li>
+                        <!-- YENİ: OLUŞTURDUĞUM GÖREVLER LİNKİ -->
+                        <li>
+                            <a href="#" id="my-tasks-link" onclick="window.setView('my-tasks'); closeSlider(); return false;" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                                 <span class="ml-3 font-semibold">Oluşturduğum Görevler</span>
                             </a>
@@ -322,6 +327,46 @@
     </div>
 
 
+    <!-- Yönetici Kullanıcı Yönetim Modalı -->
+    <div id="admin-user-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-xl w-full border border-gray-700 relative">
+            <button id="admin-user-modal-close-btn" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold mb-4 text-center text-red-400">Kullanıcı Yönetimi: <span id="admin-user-email"></span></h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Sol Panel: Puan Yönetimi -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="text-xl font-semibold mb-3 border-b border-gray-600 pb-2">Puan İşlemleri</h4>
+                    <p class="text-gray-400 mb-4">Mevcut Bakiye: <span id="admin-user-current-points" class="font-bold text-green-400">0.00 TL</span></p>
+                    
+                    <input type="number" id="admin-points-amount" placeholder="Puan Miktarı" class="w-full p-3 bg-gray-600 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3">
+                    
+                    <div class="flex gap-3">
+                        <button id="admin-add-points-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Puan Ekle</button>
+                        <button id="admin-subtract-points-btn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md">Puan Azalt</button>
+                    </div>
+                </div>
+                
+                <!-- Sağ Panel: Hesap İşlemleri -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="text-xl font-semibold mb-3 border-b border-gray-600 pb-2">Hesap İşlemleri</h4>
+                    <p class="text-gray-400 mb-4">
+                        Ban Durumu: <span id="admin-user-ban-status" class="font-bold text-green-400">Açık</span>
+                    </p>
+                    
+                    <button id="admin-toggle-ban-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md mb-3">Kullanıcıyı Yasakla</button>
+                    
+                    <button id="admin-reset-password-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Şifre Sıfırla E-posta Gönder</button>
+                </div>
+            </div>
+            
+            <p class="text-xs text-gray-500 mt-6 text-center">UID: <span id="admin-user-uid" class="font-mono"></span></p>
+        </div>
+    </div>
+
+
     <!-- Ana Konteyner -->
     <div id="app-container" class="container mx-auto p-4 md:p-6 max-w-4xl">
 
@@ -342,7 +387,6 @@
                         <button id="login-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md">Giriş Yap</button>
                         <button id="register-btn" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-md">Kayıt Ol</button>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -351,12 +395,15 @@
         <div id="main-app-screen" class="hidden">
             <!-- Üst Bilgi Paneli -->
             <header class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-gray-800 bg-opacity-70 backdrop-blur-sm rounded-xl shadow-md border border-gray-700">
+                <div class="flex items-center gap-4 cursor-pointer" onclick="window.setView('tasks');">
+                    <h1 class="text-2xl font-bold text-indigo-400">Görev Yap - TL Kazan</h1>
+                </div>
                 <div class="flex items-center gap-4">
                     <button id="menu-toggle-btn" class="p-2 rounded-md text-gray-400 hover:bg-gray-700 hover:text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                     </button>
                     <div class="text-lg">
-                        <span class="font-semibold">Kullanıcı:</span> <span id="user-email-display" class="font-mono"></span>
+                        <span class="font-semibold">Kullanıcı:</span> <span id="user-email-display" class="font-mono text-sm"></span>
                     </div>
                 </div>
                 <div class="text-2xl font-bold my-4 md:my-0">
@@ -376,7 +423,7 @@
                 </div>
             </div>
 
-            <!-- Ana İçerik (Aktif Görevler) -->
+            <!-- Ana İçerik -->
             <main id="tasks-container">
                 <!-- Öne Çıkan Görevler -->
                 <div id="featured-tasks-section" class="mb-12">
@@ -402,81 +449,67 @@
             <div id="admin-panel" class="hidden mt-16 bg-gray-800 bg-opacity-70 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-700">
                 <h2 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">Yönetici Paneli</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
-                    <!-- Kullanıcı Yönetimi Sekmesi -->
-                    <div id="user-management-section">
-                        <h3 class="text-2xl font-semibold mb-4 text-indigo-300">Kullanıcı Yönetimi</h3>
-                        
-                        <input type="text" id="user-search-input" placeholder="E-posta veya UID ile ara..." class="w-full p-3 mb-4 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-
-                        <div id="admin-user-list" class="space-y-2 max-h-96 overflow-y-auto pr-2 bg-gray-700 p-3 rounded-lg">
-                            <p class="text-center text-gray-400">Kullanıcılar yükleniyor...</p>
-                        </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Yönetim Sekmeleri -->
+                    <div class="lg:col-span-2 flex mb-4 space-x-2 border-b border-gray-700 pb-2">
+                        <button id="admin-tasks-tab" class="px-4 py-2 text-white font-semibold rounded-t-lg bg-indigo-600 hover:bg-indigo-700">Görev Yönetimi</button>
+                        <button id="admin-users-tab" class="px-4 py-2 text-gray-400 font-semibold rounded-t-lg hover:bg-gray-700">Kullanıcı Yönetimi</button>
                     </div>
-                    
-                    <!-- Yeni Görev Ekleme ve Mevcut Görevler Sekmeleri -->
-                    <div>
-                         <!-- Yeni Görev Ekleme Formu -->
-                        <div class="mb-8">
-                            <h3 class="text-2xl font-semibold mb-4">Yeni Görev Ekle</h3>
-                            <div class="space-y-4">
-                                <input type="text" id="admin-task-title" placeholder="Görev Başlığı (örn: Instagram Takip)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <input type="number" id="admin-task-points" placeholder="Kazanılacak Tutar (TL)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <input type="text" id="admin-task-link" placeholder="Görev Linki (örn: https://...)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <input type="number" id="admin-task-limit" placeholder="Görev Limiti (örn: 10)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <button id="admin-add-task-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md">Görevi Ekle</button>
-                            </div>
-                        </div>
 
-                         <!-- Mevcut Görevler Listesi -->
-                        <div>
-                            <h3 class="text-2xl font-semibold mb-4">Mevcut Görevleri Yönet</h3>
-                            <div id="admin-tasks-list" class="space-y-3 max-h-96 overflow-y-auto pr-2">
-                                <!-- Yönetici görev listesi buraya dinamik olarak eklenecek -->
-                            </div>
+                    <!-- Görev Yönetimi (Varsayılan) -->
+                    <div id="admin-tasks-content">
+                         <h3 class="text-2xl font-semibold mb-4">Yeni Görev Ekle</h3>
+                        <div class="space-y-4">
+                            <input type="text" id="admin-task-title" placeholder="Görev Başlığı (örn: Instagram Takip)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="number" id="admin-task-points" placeholder="Kazanılacak Tutar (TL)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="text" id="admin-task-link" placeholder="Görev Linki (örn: https://...)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="number" id="admin-task-limit" placeholder="Görev Limiti (örn: 10)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <button id="admin-add-task-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md">Görevi Ekle</button>
+                        </div>
+                        <h3 class="text-2xl font-semibold mt-8 mb-4">Mevcut Görevler</h3>
+                        <div id="admin-tasks-list" class="space-y-3 max-h-96 overflow-y-auto pr-2 bg-gray-900 p-3 rounded-lg">
+                            <!-- Yönetici görev listesi buraya dinamik olarak eklenecek -->
                         </div>
                     </div>
 
-                    
+                    <!-- Kullanıcı Yönetimi -->
+                    <div id="admin-users-content" class="hidden lg:col-span-2">
+                        <div class="mb-4">
+                            <input type="text" id="user-search-input" placeholder="E-posta veya UID ile ara..." class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="bg-gray-700 rounded-lg shadow-md overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-600">
+                                <thead>
+                                    <tr class="bg-gray-600 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        <th class="p-3">E-posta</th>
+                                        <th class="p-3">UID</th>
+                                        <th class="p-3">Bakiye</th>
+                                        <th class="p-3">Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-user-list" class="divide-y divide-gray-700">
+                                    <!-- Kullanıcılar buraya dinamik olarak eklenecek -->
+                                </tbody>
+                            </table>
+                            <p id="admin-user-list-message" class="p-4 text-center text-gray-400 hidden">Kullanıcı bulunamadı.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Modal Penceresi (Genel amaçlı) -->
+    <!-- Modal Penceresi (Genel Uyarılar ve Onaylar) -->
     <div id="modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-md w-full border border-gray-700">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-md w-full border border-gray-700 relative">
+            <button onclick="hideModal()" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
             <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
             <div id="modal-custom-content"></div>
             <p id="modal-message" class="text-gray-300 mb-6"></p>
             <div id="modal-buttons" class="flex justify-end gap-4">
                 <!-- Modal butonları buraya eklenecek -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- Kullanıcı Yönetim Modal'ı -->
-    <div id="admin-user-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-lg w-full border border-gray-700 relative">
-            <button id="admin-user-modal-close-btn" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h3 id="admin-user-modal-title" class="text-2xl font-bold mb-4 text-indigo-400">Kullanıcı Detayları</h3>
-            <div id="admin-user-details" class="space-y-4">
-                <!-- Kullanıcı detayları buraya yüklenecek -->
-            </div>
-            <div id="admin-user-actions" class="mt-8 space-y-4">
-                <h4 class="text-xl font-semibold border-b border-gray-700 pb-2 text-amber-400">Puan İşlemleri</h4>
-                <div class="flex space-x-2">
-                    <input type="number" id="admin-point-amount" placeholder="Puan Miktarı" class="w-1/2 p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button id="admin-add-points-btn" class="w-1/4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-2 rounded-md">Ekle</button>
-                    <button id="admin-subtract-points-btn" class="w-1/4 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-2 rounded-md">Azalt</button>
-                </div>
-
-                <h4 class="text-xl font-semibold border-b border-gray-700 pb-2 text-amber-400 mt-6">Hesap İşlemleri</h4>
-                <button id="admin-toggle-ban-btn" class="w-full btn btn-secondary text-white font-bold py-3 px-4 rounded-md">Yasakla/Yasağı Kaldır</button>
-                <button id="admin-reset-password-btn" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-md">Şifreyi Sıfırlama E-postası Gönder</button>
             </div>
         </div>
     </div>
@@ -486,7 +519,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, where, Timestamp, getDocs, writeBatch, runTransaction, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, deleteDoc, runTransaction, updateDoc, where, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // NOT: Bu config varsayılan bir yapıdadır. Gerçek bir uygulama için kendi Firebase projenizle değiştirilmelidir.
         const firebaseConfig = {
@@ -507,19 +540,17 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // DOM Elementleri
-        const loadingScreen = document.getElementById('loading-screen'), authScreen = document.getElementById('auth-screen'), mainAppScreen = document.getElementById('main-app-screen'), adminPanel = document.getElementById('admin-panel'), emailInput = document.getElementById('email-input'), passwordInput = document.getElementById('password-input'), registerBtn = document.getElementById('register-btn'), referralCodeInput = document.getElementById('referral-code-input'), loginBtn = document.getElementById('login-btn'), logoutBtn = document.getElementById('logout-btn'), userEmailDisplay = document.getElementById('user-email-display'), userPointsDisplay = document.getElementById('user-points-display'), tasksList = document.getElementById('tasks-list'), featuredTasksList = document.getElementById('featured-tasks-list'), createTaskBtn = document.getElementById('create-task-btn'), adminTaskTitle = document.getElementById('admin-task-title'), adminTaskPoints = document.getElementById('admin-task-points'), adminTaskLink = document.getElementById('admin-task-link'), adminTaskLimit = document.getElementById('admin-task-limit'), adminAddTaskBtn = document.getElementById('admin-add-task-btn'), adminTasksList = document.getElementById('admin-tasks-list'), modal = document.getElementById('modal'), modalTitle = document.getElementById('modal-title'), modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons'), modalCustomContent = document.getElementById('modal-custom-content'), menuToggleBtn = document.getElementById('menu-toggle-btn'), sliderMenu = document.getElementById('slider-menu'), sliderMenuOverlay = document.getElementById('slider-menu-overlay'), sliderCloseBtn = document.getElementById('slider-close-btn'), whatsappSupportLink = document.getElementById('whatsapp-support-link'), luckyWheelLink = document.getElementById('lucky-wheel-link'), wheelModal = document.getElementById('wheel-modal'), wheelModalCloseBtn = document.getElementById('wheel-modal-close-btn'), wheel = document.getElementById('wheel'), spinBtn = document.getElementById('spin-btn'), wheelCountdown = document.getElementById('wheel-countdown'), referralLink = document.getElementById('referral-link'), referralModal = document.getElementById('referral-modal'), referralModalCloseBtn = document.getElementById('referral-modal-close-btn'), referralCodeDisplay = document.getElementById('referral-code-display'), copyReferralBtn = document.getElementById('copy-referral-btn'), totalReferralsDisplay = document.getElementById('total-referrals-display'), totalReferralEarningsDisplay = document.getElementById('total-referral-earnings-display'), howItWorksLink = document.getElementById('how-it-works-link'), howItWorksModal = document.getElementById('how-it-works-modal'), howItWorksModalCloseBtn = document.getElementById('how-it-works-modal-close-btn'), cardSlider = document.getElementById('card-slider'), modalPagination = document.getElementById('modal-pagination'), myTasksLink = document.getElementById('my-tasks-link'), myTasksContainer = document.getElementById('my-tasks-container'), myTasksList = document.getElementById('my-tasks-list'), tasksContainer = document.getElementById('tasks-container'),
-        // YENİ DOM Elementleri
-        adminUserList = document.getElementById('admin-user-list'), userSearchInput = document.getElementById('user-search-input'), adminUserModal = document.getElementById('admin-user-modal'), adminUserModalCloseBtn = document.getElementById('admin-user-modal-close-btn'), adminUserModalTitle = document.getElementById('admin-user-modal-title'), adminUserDetails = document.getElementById('admin-user-details'), adminUserActions = document.getElementById('admin-user-actions'), adminPointAmount = document.getElementById('admin-point-amount'), adminAddPointsBtn = document.getElementById('admin-add-points-btn'), adminSubtractPointsBtn = document.getElementById('admin-subtract-points-btn'), adminToggleBanBtn = document.getElementById('admin-toggle-ban-btn'), adminResetPasswordBtn = document.getElementById('admin-reset-password-btn');
-
-
-        let currentUser = null, currentUserData = null, currentUserBalance = 0, unsubscribeTasks = null, unsubscribeAdminTasks = null, unsubscribeUser = null, unsubscribeMyTasks = null, countdownInterval = null; 
-        let allUsers = []; // Tüm kullanıcı verilerini tutacak array
-        let selectedUser = null; // Yönetici modalında seçilen kullanıcı
-        let currentView = 'tasks'; 
         
-        function setView(view) {
+        // --- GLOBAL STATE ---
+        let currentUser = null, currentUserData = null, currentUserBalance = 0, unsubscribeTasks = null, unsubscribeAdminTasks = null, unsubscribeUser = null, unsubscribeMyTasks = null, unsubscribeAllUsers = null, countdownInterval = null, currentView = 'tasks', allUsers = [];
+
+        // DOM Elementleri...
+        const loadingScreen = document.getElementById('loading-screen'), authScreen = document.getElementById('auth-screen'), mainAppScreen = document.getElementById('main-app-screen'), adminPanel = document.getElementById('admin-panel'), emailInput = document.getElementById('email-input'), passwordInput = document.getElementById('password-input'), registerBtn = document.getElementById('register-btn'), referralCodeInput = document.getElementById('referral-code-input'), loginBtn = document.getElementById('login-btn'), logoutBtn = document.getElementById('logout-btn'), userEmailDisplay = document.getElementById('user-email-display'), userPointsDisplay = document.getElementById('user-points-display'), tasksList = document.getElementById('tasks-list'), featuredTasksList = document.getElementById('featured-tasks-list'), createTaskBtn = document.getElementById('create-task-btn'), modal = document.getElementById('modal'), modalTitle = document.getElementById('modal-title'), modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons'), modalCustomContent = document.getElementById('modal-custom-content'), menuToggleBtn = document.getElementById('menu-toggle-btn'), sliderMenu = document.getElementById('slider-menu'), sliderMenuOverlay = document.getElementById('slider-menu-overlay'), sliderCloseBtn = document.getElementById('slider-close-btn'), whatsappSupportLink = document.getElementById('whatsapp-support-link'), luckyWheelLink = document.getElementById('lucky-wheel-link'), wheelModal = document.getElementById('wheel-modal'), wheelModalCloseBtn = document.getElementById('wheel-modal-close-btn'), wheel = document.getElementById('wheel'), spinBtn = document.getElementById('spin-btn'), wheelCountdown = document.getElementById('wheel-countdown'), referralLink = document.getElementById('referral-link'), referralModal = document.getElementById('referral-modal'), referralModalCloseBtn = document.getElementById('referral-modal-close-btn'), referralCodeDisplay = document.getElementById('referral-code-display'), copyReferralBtn = document.getElementById('copy-referral-btn'), totalReferralsDisplay = document.getElementById('total-referrals-display'), totalReferralEarningsDisplay = document.getElementById('total-referral-earnings-display'), howItWorksLink = document.getElementById('how-it-works-link'), howItWorksModal = document.getElementById('how-it-works-modal'), howItWorksModalCloseBtn = document.getElementById('how-it-works-modal-close-btn'), cardSlider = document.getElementById('card-slider'), modalPagination = document.getElementById('modal-pagination'), myTasksLink = document.getElementById('my-tasks-link'), myTasksContainer = document.getElementById('my-tasks-container'), myTasksList = document.getElementById('my-tasks-list'), tasksContainer = document.getElementById('tasks-container'), adminUserModal = document.getElementById('admin-user-modal'), adminUserModalCloseBtn = document.getElementById('admin-user-modal-close-btn');
+
+
+        // --- UI GÖRÜNÜMÜ YÖNETİMİ ---
+        // window.setView ile dışarıdan erişilebilir kılındı (Hata çözümü)
+        window.setView = function(view) {
             currentView = view;
             tasksContainer.classList.add('hidden');
             myTasksContainer.classList.add('hidden');
@@ -527,32 +558,13 @@
 
             if (view === 'tasks') {
                 tasksContainer.classList.remove('hidden');
+                if (currentUser && currentUser.uid === ADMIN_UID) adminPanel.classList.remove('hidden');
             } else if (view === 'my-tasks') {
                 myTasksContainer.classList.remove('hidden');
             }
-            // Admin panelini sadece yönetici ve tasks görünümündeyken göster
-            if (currentUser && currentUser.uid === ADMIN_UID && view === 'tasks') {
-                adminPanel.classList.remove('hidden');
-            }
         }
         
-
-        const wheelPrizes = [5, 1, 3, 2, 4, 1, 3, 2];
-        const sliceAngle = 360 / wheelPrizes.length;
-        
-        function createWheelSlices() {
-            wheel.innerHTML = '';
-            wheelPrizes.forEach((prize, index) => {
-                const slice = document.createElement('div');
-                slice.className = 'slice';
-                slice.innerHTML = `<span>${prize} TL</span>`;
-                slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-45deg)`; 
-
-                wheel.appendChild(slice);
-            });
-        }
-        createWheelSlices();
-        
+        // --- MODAL YÖNETİMİ ---
         function showModal(title, message, buttons, customHTML = '') {
             modalTitle.textContent = title;
             modalMessage.textContent = message;
@@ -589,61 +601,339 @@
             return result;
         }
 
-        onAuthStateChanged(auth, async user => {
+        // --- YÖNETİCİ KULLANICI YÖNETİMİ FONKSİYONLARI ---
+
+        // Yöneticinin kullanıcı detay modalını açar
+        function openAdminUserModal(user) {
+            document.getElementById('admin-user-email').textContent = user.email;
+            document.getElementById('admin-user-uid').textContent = user.uid;
+            document.getElementById('admin-user-current-points').textContent = `${user.points.toFixed(2)} TL`;
+            
+            const banStatusElement = document.getElementById('admin-user-ban-status');
+            const toggleBanBtn = document.getElementById('admin-toggle-ban-btn');
+            
+            if (user.isBanned) {
+                banStatusElement.textContent = 'YASAKLI';
+                banStatusElement.className = 'font-bold text-red-400';
+                toggleBanBtn.textContent = 'Yasağı Kaldır';
+                toggleBanBtn.classList.replace('bg-red-600', 'bg-green-600');
+                toggleBanBtn.classList.replace('hover:bg-red-700', 'hover:bg-green-700');
+            } else {
+                banStatusElement.textContent = 'Açık';
+                banStatusElement.className = 'font-bold text-green-400';
+                toggleBanBtn.textContent = 'Kullanıcıyı Yasakla';
+                toggleBanBtn.classList.replace('bg-green-600', 'bg-red-600');
+                toggleBanBtn.classList.replace('hover:bg-green-700', 'hover:bg-red-700');
+            }
+            
+            adminUserModal.classList.remove('hidden');
+        }
+
+        // Puan ekleme/çıkarma işlemi
+        async function updatePoints(uid, amount, type) {
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, "users", uid);
+                    const userDoc = await transaction.get(userRef);
+                    
+                    if (!userDoc.exists()) throw new Error("Kullanıcı bulunamadı.");
+                    
+                    const currentPoints = userDoc.data().points || 0;
+                    let newPoints;
+                    
+                    if (type === 'add') {
+                        newPoints = currentPoints + amount;
+                    } else if (type === 'subtract') {
+                        newPoints = currentPoints - amount;
+                        if (newPoints < 0) newPoints = 0; // Bakiyeyi sıfırın altına düşürme
+                    } else {
+                        throw new Error("Geçersiz işlem tipi.");
+                    }
+
+                    transaction.update(userRef, { points: newPoints });
+                });
+                showAlert('Başarılı', `Kullanıcının bakiyesi güncellendi: ${type === 'add' ? '+' : '-'}${amount.toFixed(2)} TL.`);
+            } catch (error) {
+                showAlert('Hata', 'Puan güncelleme hatası: ' + error.message);
+            }
+        }
+        
+        // Ban durumu değiştirme
+        async function toggleBan(uid, currentStatus) {
+            try {
+                await updateDoc(doc(db, "users", uid), { isBanned: !currentStatus });
+                showAlert('Başarılı', `Kullanıcı ${!currentStatus ? 'yasaklandı' : 'yasağı kaldırıldı'}.`);
+            } catch (error) {
+                showAlert('Hata', 'Ban güncelleme hatası: ' + error.message);
+            }
+        }
+
+        // --- FIREBASE LISTENERS VE LOGIC ---
+
+        onAuthStateChanged(auth, user => {
             if (user) {
                 currentUser = user;
-                
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists() && userDoc.data().isBanned) {
-                    await signOut(auth);
-                    showAlert('Giriş Engellendi', 'Hesabınız yönetici tarafından yasaklanmıştır. Destek hattıyla iletişime geçin.');
-                    return;
-                }
-
                 authScreen.classList.add('hidden');
                 mainAppScreen.classList.remove('hidden');
                 userEmailDisplay.textContent = user.email || user.displayName || "Misafir Kullanıcı"; 
                 
-                if (user.uid === ADMIN_UID) {
-                    listenToAdminTasks();
-                    listenToAllUsers(); 
-                } 
-                
                 listenToUserData(user.uid);
                 listenToTasks(user.uid);
-                listenToMyTasks(user.uid); 
-                setView('tasks'); 
+                listenToMyTasks(user.uid);
+
+                if (user.uid === ADMIN_UID) {
+                    initializeAdminListeners(); // Yönetici event'larını yükle
+                    listenToAllUsers(); // Tüm kullanıcıları dinlemeye başla
+                } else {
+                    // Normal kullanıcı için gereksiz listenerları kapat
+                    if (unsubscribeAdminTasks) unsubscribeAdminTasks();
+                    if (unsubscribeAllUsers) unsubscribeAllUsers();
+                }
+
+                // BAN KONTROLÜ (Giriş yaptıktan hemen sonra)
+                if (currentUserData && currentUserData.isBanned) {
+                    signOut(auth);
+                    showAlert('Hesap Yasaklı', 'Bu hesap yönetici tarafından yasaklanmıştır.');
+                    return;
+                }
+                
+                setView('tasks');
             } else {
                 currentUser = null;
                 currentUserData = null; 
                 authScreen.classList.remove('hidden');
                 mainAppScreen.classList.add('hidden');
-                adminPanel.classList.add('hidden');
+                
                 if (unsubscribeTasks) unsubscribeTasks();
                 if (unsubscribeAdminTasks) unsubscribeAdminTasks();
                 if (unsubscribeUser) unsubscribeUser();
                 if (unsubscribeMyTasks) unsubscribeMyTasks();
+                if (unsubscribeAllUsers) unsubscribeAllUsers();
             }
             loadingScreen.classList.add('hidden');
         });
-        
-        async function createOrUpdateUserDoc(user) {
-            const userRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userRef);
 
-            if (!userDoc.exists()) {
-                const newUserPayload = {
-                    email: user.email,
-                    points: 0,
-                    lastSpinTimestamp: 0,
-                    referralCode: generateReferralCode(), 
-                    referralEarnings: 0,
-                    isBanned: false 
-                };
-                await setDoc(userRef, newUserPayload);
-            }
+        // Tüm kullanıcıları çek ve ara/filtreleme listesini güncelle (Yönetici için)
+        function listenToAllUsers() {
+            if (unsubscribeAllUsers) unsubscribeAllUsers();
+            const q = query(collection(db, "users"));
+
+            unsubscribeAllUsers = onSnapshot(q, (querySnapshot) => {
+                const adminUserList = document.getElementById('admin-user-list');
+                const userSearchInput = document.getElementById('user-search-input');
+                const adminUserListMessage = document.getElementById('admin-user-list-message');
+
+                allUsers = [];
+                querySnapshot.forEach((doc) => {
+                    allUsers.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Puanlara göre sırala
+                allUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
+
+                // Arama filtresini uygula
+                renderUserList(allUsers, adminUserList, userSearchInput, adminUserListMessage);
+            });
         }
+        
+        // Kullanıcı listesini render eden yardımcı fonksiyon
+        function renderUserList(users, listElement, searchInput, messageElement) {
+            const searchTerm = searchInput.value.toLowerCase();
+            listElement.innerHTML = '';
+            
+            const filteredUsers = users.filter(user => 
+                user.email.toLowerCase().includes(searchTerm) || 
+                user.referralCode.toLowerCase().includes(searchTerm) ||
+                user.id.toLowerCase().includes(searchTerm)
+            );
 
+            if (filteredUsers.length === 0) {
+                messageElement.textContent = 'Aradığınız kritere uygun kullanıcı bulunamadı.';
+                messageElement.classList.remove('hidden');
+                return;
+            } else {
+                messageElement.classList.add('hidden');
+            }
+
+            filteredUsers.forEach((user) => {
+                const row = document.createElement('tr');
+                row.className = 'admin-user-row hover:bg-gray-700 transition-colors duration-150';
+                row.dataset.uid = user.id;
+                
+                const statusColor = user.isBanned ? 'bg-red-600' : 'bg-green-600';
+                const statusText = user.isBanned ? 'YASAKLI' : 'AKTİF';
+
+                row.innerHTML = `
+                    <td class="p-3 text-sm font-medium text-white">${user.email}</td>
+                    <td class="p-3 text-xs text-gray-400 font-mono">${user.id.substring(0, 6)}...</td>
+                    <td class="p-3 text-sm text-green-400 font-bold">${(user.points || 0).toFixed(2)} TL</td>
+                    <td class="p-3 text-xs font-semibold">
+                        <span class="px-2 py-0.5 rounded-full text-white ${statusColor}">${statusText}</span>
+                    </td>
+                `;
+                listElement.appendChild(row);
+            });
+        }
+        
+        // --- YÖNETİCİ BUTON OLAY DİNLEYİCİLERİ VE MANTIĞI ---
+        
+        function initializeAdminListeners() {
+            // SADECE YÖNETİCİ GİRİŞ YAPTIĞINDA VE ELEMENTLER VAR OLDUĞUNDA ÇALIŞIR (HATA ÇÖZÜMÜ)
+            
+            const adminTasksTab = document.getElementById('admin-tasks-tab');
+            const adminUsersTab = document.getElementById('admin-users-tab');
+            const adminTasksContent = document.getElementById('admin-tasks-content');
+            const adminUsersContent = document.getElementById('admin-users-content');
+            
+            const adminAddTaskBtn = document.getElementById('admin-add-task-btn');
+            const adminTaskTitle = document.getElementById('admin-task-title');
+            const adminTaskPoints = document.getElementById('admin-task-points');
+            const adminTaskLink = document.getElementById('admin-task-link');
+            const adminTaskLimit = document.getElementById('admin-task-limit');
+            const adminTasksList = document.getElementById('admin-tasks-list');
+            
+            const userSearchInput = document.getElementById('user-search-input');
+            const adminUserList = document.getElementById('admin-user-list');
+            const adminUserListMessage = document.getElementById('admin-user-list-message');
+            
+            const adminAddPointsBtn = document.getElementById('admin-add-points-btn');
+            const adminSubtractPointsBtn = document.getElementById('admin-subtract-points-btn');
+            const adminToggleBanBtn = document.getElementById('admin-toggle-ban-btn');
+            const adminResetPasswordBtn = document.getElementById('admin-reset-password-btn');
+
+            // 1. Sekme Yönetimi
+            adminTasksTab.onclick = () => {
+                adminTasksContent.classList.remove('hidden');
+                adminUsersContent.classList.add('hidden');
+                adminTasksTab.classList.replace('text-gray-400', 'text-white');
+                adminTasksTab.classList.add('bg-indigo-600');
+                adminUsersTab.classList.replace('text-white', 'text-gray-400');
+                adminUsersTab.classList.remove('bg-indigo-600');
+            };
+            
+            adminUsersTab.onclick = () => {
+                adminTasksContent.classList.add('hidden');
+                adminUsersContent.classList.remove('hidden');
+                adminUsersTab.classList.replace('text-gray-400', 'text-white');
+                adminUsersTab.classList.add('bg-indigo-600');
+                adminTasksTab.classList.replace('text-white', 'text-gray-400');
+                adminTasksTab.classList.remove('bg-indigo-600');
+            };
+
+            // 2. Görev Ekleme
+            if (adminAddTaskBtn) {
+                adminAddTaskBtn.onclick = async () => {
+                    const title = adminTaskTitle.value, points = parseInt(adminTaskPoints.value), link = adminTaskLink.value, limit = parseInt(adminTaskLimit.value);
+                    if (!title || !points || !link || !limit) { showAlert('Hata', 'Lütfen tüm alanları doldurun.'); return; }
+                    try {
+                        await addDoc(collection(db, "tasks"), { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: ADMIN_UID, isFeatured: false, featureExpiresAt: null, isManagerTask: true }); // isManagerTask: true eklendi
+                        showAlert('Başarılı', 'Yeni görev eklendi.');
+                        adminTaskTitle.value = ''; adminTaskPoints.value = ''; adminTaskLink.value = ''; adminTaskLimit.value = '';
+                    } catch (error) { showAlert('Hata', 'Görev eklenirken bir sorun oluştu: ' + error.message); }
+                };
+            }
+            
+            // 3. Yönetici Görev Silme Dinleyicisi
+            if (adminTasksList) {
+                adminTasksList.addEventListener('click', async (e) => {
+                    if (e.target.classList.contains('admin-delete-task-btn')) {
+                        const taskId = e.target.dataset.id;
+                        showModal('Görevi Sil', 'Bu görevi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.', [
+                            { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
+                            { text: 'Evet, Sil', class: 'btn btn-secondary text-white font-bold py-2 px-4 rounded-md', onClick: async () => { await deleteDoc(doc(db, "tasks", taskId)); showAlert('Başarılı', 'Görev silindi.'); }}
+                        ]);
+                    }
+                });
+            }
+            
+            // 4. Kullanıcı Arama
+            if (userSearchInput) {
+                userSearchInput.oninput = () => {
+                    renderUserList(allUsers, adminUserList, userSearchInput, adminUserListMessage);
+                };
+            }
+
+            // 5. Kullanıcı Yönetim Modalı Açma
+            if (adminUserList) {
+                adminUserList.addEventListener('click', (e) => {
+                    const row = e.target.closest('.admin-user-row');
+                    if (row) {
+                        const uid = row.dataset.uid;
+                        const user = allUsers.find(u => u.id === uid);
+                        if (user) {
+                            openAdminUserModal(user);
+                        }
+                    }
+                });
+            }
+
+            // 6. Yönetim Modal Kapatma
+            if (adminUserModalCloseBtn) {
+                adminUserModalCloseBtn.onclick = () => {
+                    adminUserModal.classList.add('hidden');
+                };
+            }
+
+            // 7. Puan İşlemleri
+            if (adminAddPointsBtn && adminSubtractPointsBtn) {
+                adminAddPointsBtn.onclick = () => {
+                    const uid = document.getElementById('admin-user-uid').textContent;
+                    const amountInput = document.getElementById('admin-points-amount');
+                    const amount = parseFloat(amountInput.value);
+                    if (amount > 0) { updatePoints(uid, amount, 'add'); adminUserModal.classList.add('hidden'); amountInput.value = ''; } 
+                    else { showAlert('Hata', 'Geçerli bir pozitif miktar giriniz.'); }
+                };
+                adminSubtractPointsBtn.onclick = () => {
+                    const uid = document.getElementById('admin-user-uid').textContent;
+                    const amountInput = document.getElementById('admin-points-amount');
+                    const amount = parseFloat(amountInput.value);
+                    if (amount > 0) { updatePoints(uid, amount, 'subtract'); adminUserModal.classList.add('hidden'); amountInput.value = ''; } 
+                    else { showAlert('Hata', 'Geçerli bir pozitif miktar giriniz.'); }
+                };
+            }
+            
+            // 8. Ban İşlemleri
+            if (adminToggleBanBtn) {
+                adminToggleBanBtn.onclick = () => {
+                    const uid = document.getElementById('admin-user-uid').textContent;
+                    const user = allUsers.find(u => u.id === uid);
+                    if (user) { toggleBan(uid, user.isBanned); adminUserModal.classList.add('hidden'); }
+                };
+            }
+            
+            // 9. Şifre Sıfırlama
+            if (adminResetPasswordBtn) {
+                adminResetPasswordBtn.onclick = async () => {
+                    const email = document.getElementById('admin-user-email').textContent;
+                    try {
+                        await sendPasswordResetEmail(auth, email);
+                        showAlert('Başarılı', `${email} adresine şifre sıfırlama e-postası gönderildi.`);
+                        adminUserModal.classList.add('hidden');
+                    } catch (error) {
+                         // Firebase'in şifre sıfırlama e-postasını göndermek için kullanıcı oturumunun açık olmaması gerekebilir.
+                        showAlert('Hata', 'Şifre sıfırlama e-postası gönderilemedi. Hata: ' + error.message);
+                    }
+                };
+            }
+
+        } // End of initializeAdminListeners
+
+        // ... (Diğer fonksiyonlar burada devam eder)
+
+        // --- ÇARK KODU ---
+        function createWheelSlices() {
+            wheel.innerHTML = '';
+            wheelPrizes.forEach((prize, index) => {
+                const slice = document.createElement('div');
+                slice.className = 'slice';
+                slice.innerHTML = `<span>${prize} TL</span>`;
+                slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-45deg)`; 
+                wheel.appendChild(slice);
+            });
+        }
+        createWheelSlices();
+
+        // --- USER DATA LISTENERS (GEREKLİ) ---
         function listenToUserData(uid) {
             if (unsubscribeUser) unsubscribeUser();
             const userDocRef = doc(db, "users", uid);
@@ -652,54 +942,42 @@
                     currentUserData = docSnap.data();
                     currentUserBalance = currentUserData.points || 0;
                     
+                    // BAN KONTROLÜ
+                    if (currentUserData.isBanned && currentUser && currentUser.uid === uid) {
+                        signOut(auth);
+                        showAlert('Hesap Yasaklı', 'Bu hesap yönetici tarafından yasaklanmıştır.');
+                        return;
+                    }
+
+                    // YÖNETİCİ KONTROLÜ VE SINIRSIZ BAKIYE GÖSTERİMİ
                     if (uid === ADMIN_UID) {
                         userPointsDisplay.textContent = '∞'; 
                         userPointsDisplay.classList.remove('text-green-400');
                         userPointsDisplay.classList.add('text-indigo-400');
                         createTaskBtn.classList.remove('hidden'); 
+                        
+                        if (currentView === 'tasks') adminPanel.classList.remove('hidden');
+                        
+                        // Yönetici girişi yapıldığına dair emin olmak için yeniden başlatma
+                        if (!document.getElementById('admin-users-tab').onclick) {
+                             initializeAdminListeners();
+                        }
                     } else {
                         userPointsDisplay.textContent = currentUserBalance.toFixed(2);
                         userPointsDisplay.classList.add('text-green-400');
                         userPointsDisplay.classList.remove('text-indigo-400');
                         createTaskBtn.classList.toggle('hidden', currentUserBalance < MINIMUM_BALANCE_TO_CREATE_TASK);
+                        adminPanel.classList.add('hidden');
                     }
                 } else {
                     currentUserData = null;
                     currentUserBalance = 0;
                     userPointsDisplay.textContent = "0.00";
                 }
-                setView(currentView); // Bakiyeler güncellendiğinde görünümü yenile
-            });
-        }
-        
-        function listenToAdminTasks() {
-             if (unsubscribeAdminTasks) unsubscribeAdminTasks();
-            const q = query(collection(db, "tasks"));
-            unsubscribeAdminTasks = onSnapshot(q, (querySnapshot) => {
-                adminTasksList.innerHTML = '';
-                 if (querySnapshot.empty) {
-                    adminTasksList.innerHTML = '<p class="text-center text-gray-400">Mevcut görev yok.</p>';
-                    return;
-                }
-                querySnapshot.forEach((doc) => {
-                    const task = { id: doc.id, ...doc.data() };
-                    const isManagerTask = task.createdBy === ADMIN_UID; 
-                    const creatorInfo = isManagerTask ? '(Yönetici Tarafından)' : `(Kullanıcı: ${task.createdBy.substring(0, 4)}...)`;
-
-                    const item = document.createElement('div');
-                    item.className = 'bg-gray-700 p-3 rounded-md flex justify-between items-center';
-                    item.innerHTML = `
-                        <div>
-                            <p class="font-semibold">${task.title} <span class="text-xs text-indigo-300">${creatorInfo}</span></p>
-                            <p class="text-sm text-gray-400">Limit: ${task.completedCount}/${task.limit} | Tutar: ${task.points.toFixed(2)} TL</p>
-                        </div>
-                        <button data-id="${task.id}" class="admin-delete-task-btn btn btn-secondary text-white font-bold py-1 px-3 rounded-md text-sm">Sil</button>
-                    `;
-                    adminTasksList.appendChild(item);
-                });
             });
         }
 
+        // --- TASK LISTENERS ---
         function listenToMyTasks(uid) {
             if (unsubscribeMyTasks) unsubscribeMyTasks();
             const q = query(collection(db, "tasks"), where("createdBy", "==", uid));
@@ -782,12 +1060,10 @@
             
             let buttonHTML = '';
             if (isOwnTask) {
-                // Kendi görevini öne çıkarma butonu
-                const isFeaturedNow = task.isFeatured && task.featureExpiresAt && task.featureExpiresAt.toMillis() > Date.now();
-                const featureBtnText = isFeaturedNow ? 'Öne Çıkarıldı' : 'Öne Çıkar';
-                const featureBtnClass = isFeaturedNow ? 'bg-amber-700 hover:bg-amber-800' : 'bg-amber-500 hover:bg-amber-600';
+                const featureBtnText = (task.isFeatured && task.featureExpiresAt && task.featureExpiresAt.toMillis() > Date.now()) ? 'Öne Çıkarıldı' : 'Öne Çıkar';
+                const featureBtnClass = (task.isFeatured && task.featureExpiresAt && task.featureExpiresAt.toMillis() > Date.now()) ? 'bg-amber-700 hover:bg-amber-800' : 'bg-amber-500 hover:bg-amber-600';
                 buttonHTML = `
-                    <button class="w-full btn ${featureBtnClass} text-white font-bold py-2 px-4 rounded-md feature-task-btn mt-2" data-id="${task.id}" ${isFeaturedNow ? 'disabled' : ''}>${featureBtnText}</button>
+                    <button class="w-full btn ${featureBtnClass} text-white font-bold py-2 px-4 rounded-md feature-task-btn mt-2" data-id="${task.id}" ${featureBtnText === 'Öne Çıkarıldı' ? 'disabled' : ''}>${featureBtnText}</button>
                 `;
             } else if (userHasCompleted) {
                 buttonHTML = `<button class="w-full btn btn-disabled text-white font-bold py-2 px-4 rounded-md" disabled>Tamamlandı</button>`;
@@ -811,8 +1087,16 @@
             `;
             return card;
         }
-
+        
+        // --- GÖREV TAMAMLAMA ---
         async function completeTaskTransaction(taskId) {
+            // Ban kontrolü tekrar yapıldı
+            if (currentUserData.isBanned) {
+                 signOut(auth);
+                 showAlert('Hesap Yasaklı', 'Yasaklı hesaplar görev tamamlayamaz.');
+                 return;
+            }
+
             try {
                 let earnedAmount = 0;
                 await runTransaction(db, async (transaction) => {
@@ -834,13 +1118,10 @@
                     if (taskData.completedCount >= taskData.limit) throw new Error("Bu görevin limiti dolmuştur.");
                     if (taskData.createdBy === currentUser.uid) throw new Error("Kendi görevinizi tamamlayamazsınız.");
                     
-                    // Ban kontrolü
-                    if (userData.isBanned) throw new Error("Hesabınız yasaklı olduğu için görev yapamazsınız.");
-
-                    // Görevi tamamlayan kullanıcıya ödülü ekle
-                    transaction.update(userRef, { points: (userData.points || 0) + taskData.points });
+                    // IP KONTROLÜ
+                    // NOT: Gerçek IP kontrolü sunucu tarafında yapılmalıdır. Bu, sadece istemci tarafında bir simülasyondur.
                     
-                    // Görev belgesini güncelle
+                    transaction.update(userRef, { points: (userData.points || 0) + taskData.points });
                     transaction.update(taskRef, { 
                         completedCount: taskData.completedCount + 1, 
                         completedBy: [...completedBy, currentUser.uid] 
@@ -885,44 +1166,62 @@
         }
 
         function showUploadPrompt(taskId) {
+            if (currentUserData.isBanned) {
+                 showAlert('Hesap Yasaklı', 'Yasaklı hesaplar görev tamamlayamaz.');
+                 return;
+            }
             const customHTML = `<p class="text-gray-300 mb-4">Görevi tamamladığınıza dair kanıt (ekran görüntüsü) yükleyin.</p><input type="file" id="modal-file-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>`;
             showModal('Görevi Onayla', '', [ 
                 { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }, 
                 { text: 'Onayla & Başlat', id: 'modal-confirm-upload', class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md opacity-50 cursor-not-allowed', onClick: () => startCountdown(taskId), keepOpen: true } 
             ], customHTML);
+            
             const fileInput = document.getElementById('modal-file-input');
             const confirmBtn = document.getElementById('modal-confirm-upload');
-            confirmBtn.disabled = true;
-            confirmBtn.classList.add('btn-disabled'); 
-            fileInput.addEventListener('change', () => {
-                if (fileInput.files.length > 0) { 
-                    confirmBtn.disabled = false; 
-                    confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'btn-disabled'); 
-                } else { 
-                    confirmBtn.disabled = true; 
-                    confirmBtn.classList.add('opacity-50', 'cursor-not-allowed', 'btn-disabled'); 
-                }
-            });
+            if(confirmBtn) confirmBtn.disabled = true;
+
+            if(fileInput) {
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files.length > 0) { 
+                        if(confirmBtn) {
+                            confirmBtn.disabled = false; 
+                            confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        }
+                    } else { 
+                        if(confirmBtn) {
+                            confirmBtn.disabled = true; 
+                            confirmBtn.classList.add('opacity-50', 'cursor-not-allowed'); 
+                        }
+                    }
+                });
+            }
         }
         
+        // --- ÖNE ÇIKARMA ---
         async function featureTask(taskId, cost, durationInMs) {
+            const isManager = currentUser.uid === ADMIN_UID;
+            
             try {
-                 await runTransaction(db, async (transaction) => {
+                await runTransaction(db, async (transaction) => {
                     const userRef = doc(db, "users", currentUser.uid);
                     const taskRef = doc(db, "tasks", taskId);
 
                     const userDoc = await transaction.get(userRef);
-                    if (currentUser.uid !== ADMIN_UID && (!userDoc.exists() || (userDoc.data().points || 0) < cost)) {
+                    const taskDoc = await transaction.get(taskRef);
+                    if (!userDoc.exists() || !taskDoc.exists()) throw new Error("Kullanıcı veya görev bulunamadı.");
+
+                    if (!isManager && (userDoc.data().points || 0) < cost) {
                         throw new Error("Öne çıkarma işlemi için yetersiz bakiye.");
                     }
+                    if (taskDoc.data().createdBy !== currentUser.uid) throw new Error("Bu görevi öne çıkarma yetkiniz yok.");
 
-                    if(currentUser.uid !== ADMIN_UID){
+                    const expiryDate = new Date(Date.now() + durationInMs);
+
+                    if (!isManager) {
                          const newBalance = userDoc.data().points - cost;
                          transaction.update(userRef, { points: newBalance });
                     }
                     
-                    const expiryDate = new Date(Date.now() + durationInMs);
-
                     transaction.update(taskRef, {
                         isFeatured: true,
                         featureExpiresAt: Timestamp.fromDate(expiryDate)
@@ -934,258 +1233,96 @@
             }
         }
 
+        // Globalde tanımlandı (Hata çözümü)
+        window.featureTaskGlobal = async (taskId, cost, durationMs) => {
+            hideModal();
+            await featureTask(taskId, cost, durationMs);
+        };
+
         function showFeatureTaskModal(taskId) {
+            const isManager = currentUser.uid === ADMIN_UID;
+            const costText = isManager ? 'ÜCRETSİZ' : ' TL';
+            
             const featureOptions = {
                 '1 Saat': { cost: 10, durationMs: 60 * 60 * 1000 },
                 '1 Gün': { cost: 100, durationMs: 24 * 60 * 60 * 1000 },
-                '1 Hafta': { cost: 700, durationMs: 7 * 24 * 60 * 60 * 1000 },
-                '1 Ay': { cost: 2500, durationMs: 30 * 24 * 60 * 60 * 1000 }
+                '1 Hafta': { cost: 1000, durationMs: 7 * 24 * 60 * 60 * 1000 },
+                '1 Ay': { cost: 10000, durationMs: 30 * 24 * 60 * 60 * 1000 }
             };
 
             let buttonsHTML = '';
             for (const [key, value] of Object.entries(featureOptions)) {
-                
-                const actualCost = (currentUser && currentUser.uid === ADMIN_UID) ? 0 : value.cost;
-                const costDisplay = (currentUser && currentUser.uid === ADMIN_UID) ? 'ÜCRETSİZ' : `${actualCost.toFixed(2)} TL`;
-                const isDisabled = (currentUser && currentUser.uid !== ADMIN_UID) && (currentUserBalance < actualCost);
-                
+                const finalCost = isManager ? 0 : value.cost;
+                const isDisabled = !isManager && currentUserBalance < finalCost;
                 const disabledClass = isDisabled ? 'btn-disabled opacity-50' : 'bg-amber-600 hover:bg-amber-700';
                 
-                buttonsHTML += `<button ${isDisabled ? 'disabled' : ''} onclick="window.featureTaskGlobal('${taskId}', ${actualCost}, ${value.durationMs})" class="w-full btn ${disabledClass} text-white font-bold py-3 px-4 rounded-md">${key} (${costDisplay})</button>`;
+                buttonsHTML += `<button ${isDisabled ? 'disabled' : ''} onclick="window.featureTaskGlobal('${taskId}', ${finalCost}, ${value.durationMs})" class="w-full btn ${disabledClass} text-white font-bold py-3 px-4 rounded-md">${key} (${finalCost}${costText})</button>`;
             }
 
             const customHTML = `<div class="space-y-3">${buttonsHTML}</div>`;
             showModal(
                 'Görevi Öne Çıkar', 
-                'Görevinizi daha fazla kişiye ulaştırmak için öne çıkarabilirsiniz. Mevcut Bakiyeniz: ' + (currentUser && currentUser.uid === ADMIN_UID ? 'SINIRSIZ' : currentUserBalance.toFixed(2) + ' TL'),
-                [{ text: 'Kapat', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }],
+                'Görevinizi daha fazla kişiye ulaştırmak için öne çıkarabilirsiniz. Mevcut Bakiyeniz: ' + (isManager ? 'SINIRSIZ' : currentUserBalance.toFixed(2) + ' TL'),
+                [{ text: 'Hayır, Teşekkürler', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }],
                 customHTML
             );
         }
-        
-        window.featureTaskGlobal = async (taskId, cost, durationMs) => {
-             hideModal();
-             await featureTask(taskId, cost, durationMs);
-        };
 
         function showCreateTaskModal() {
-             const formHTML = `<div class="space-y-4"><input type="text" id="user-task-title" placeholder="Görev Başlığı (örn: Instagram Takip)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"><input type="text" id="user-task-link" placeholder="Görev Linki (örn: https://...)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"><div class="flex gap-4"><input type="number" id="user-task-reward" placeholder="Kişi Başı Ödül (TL)" class="w-1/2 p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" min="0.1" step="0.1"><input type="number" id="user-task-limit" placeholder="Kişi Limiti" class="w-1/2 p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" min="1"></div><div class="bg-gray-900 p-3 rounded-md text-center"><p class="text-gray-400">Toplam Maliyet</p><p id="total-cost-display" class="text-2xl font-bold text-green-400">0 TL</p></div></div>`;
-             showModal('Yeni Görev Oluştur', '', [ { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }, { text: "Görevi Oluştur", id: 'confirm-create-task-btn', class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md btn-disabled', onClick: async () => {
-                const title = document.getElementById('user-task-title').value, link = document.getElementById('user-task-link').value, points = parseFloat(document.getElementById('user-task-reward').value), limit = parseInt(document.getElementById('user-task-limit').value), totalCost = points * limit;
-                if (!title || !link || !points || !limit || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
-                
-                const isManager = currentUser && currentUser.uid === ADMIN_UID;
-                
-                if (!isManager && currentUserBalance < totalCost) { 
-                    showAlert('Hata', 'Bu görevi oluşturmak için yeterli bakiyeniz yok. Görev maliyeti: ' + totalCost.toFixed(2) + ' TL'); 
-                    return; 
-                }
-                
-                try {
-                    let newTaskId;
-                    await runTransaction(db, async (transaction) => {
-                        const userRef = doc(db, "users", currentUser.uid); 
-                        const userDoc = await transaction.get(userRef); 
-                        if (!userDoc.exists()) throw new Error("Kullanıcı bulunamadı.");
+            const isManager = currentUser.uid === ADMIN_UID;
+            const currentBalanceText = isManager ? 'SINIRSIZ' : currentUserBalance.toFixed(2) + ' TL';
 
-                        if (!isManager) {
-                            if ((userDoc.data().points || 0) < totalCost) throw new Error("Yetersiz bakiye.");
-                            transaction.update(userRef, { points: userDoc.data().points - totalCost });
-                        }
-
-                        const newTaskRef = doc(collection(db, "tasks"));
-                        newTaskId = newTaskRef.id;
-                        transaction.set(newTaskRef, { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: currentUser.uid, isFeatured: false, featureExpiresAt: null });
-                    }); 
-                    hideModal();
-                    showFeatureTaskModal(newTaskId);
-                } catch(error) { showAlert('Hata', 'Görev oluşturulurken bir hata oluştu: ' + error.message); }
-            } } ], formHTML);
-            const rewardInput = document.getElementById('user-task-reward'), limitInput = document.getElementById('user-task-limit'), costDisplay = document.getElementById('total-cost-display'), confirmBtn = document.getElementById('confirm-create-task-btn');
-            function updateCost() { 
-                const reward = parseFloat(rewardInput.value) || 0; 
-                const limit = parseInt(limitInput.value) || 0; 
-                const totalCost = reward * limit; 
-                
-                const isManager = currentUser && currentUser.uid === ADMIN_UID;
-                const costText = isManager ? 'SINIRSIZ' : `${totalCost.toFixed(2)} TL`;
-                costDisplay.textContent = costText; 
-                
-                confirmBtn.disabled = !isManager && !(totalCost > 0 && currentUserBalance >= totalCost);
-                confirmBtn.classList.toggle('btn-disabled', confirmBtn.disabled);
-                confirmBtn.classList.toggle('opacity-50', confirmBtn.disabled);
-                confirmBtn.classList.toggle('cursor-not-allowed', confirmBtn.disabled);
-            }
-            rewardInput.addEventListener('input', updateCost); 
-            limitInput.addEventListener('input', updateCost);
+             const formHTML = `<div class="space-y-4"><input type="text" id="user-task-title" placeholder="Görev Başlığı (örn: Instagram Takip)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"><input type="text" id="user-task-link" placeholder="Görev Linki (örn: https://...)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"><div class="flex gap-4"><input type="number" id="user-task-reward" placeholder="Kişi Başı Ödül (TL)" class="w-1/2 p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"><input type="number" id="user-task-limit" placeholder="Kişi Limiti" class="w-1/2 p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"></div><div class="bg-gray-900 p-3 rounded-md text-center"><p class="text-gray-400">Toplam Maliyet (Mevcut Bakiye: ${currentBalanceText})</p><p id="total-cost-display" class="text-2xl font-bold text-green-400">0 TL</p></div></div>`;
+             
+             showModal('Yeni Görev Oluştur', '', [ 
+                 { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }, 
+                 { text: "Görevi Oluştur", id: 'confirm-create-task-btn', class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md btn-disabled', onClick: async () => {
+                 const title = document.getElementById('user-task-title').value, link = document.getElementById('user-task-link').value, points = parseFloat(document.getElementById('user-task-reward').value), limit = parseInt(document.getElementById('user-task-limit').value), totalCost = points * limit;
+                 if (!title || !link || !points || !limit || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
+                 
+                 if (!isManager && currentUserBalance < totalCost) { showAlert('Hata', 'Bu görevi oluşturmak için yeterli bakiyeniz yok.'); return; }
+                 
+                 try {
+                     let newTaskId;
+                     await runTransaction(db, async (transaction) => {
+                         const userRef = doc(db, "users", currentUser.uid); 
+                         const userDoc = await transaction.get(userRef); 
+                         
+                         if (!isManager) {
+                              if (!userDoc.exists() || userDoc.data().points < totalCost) throw new Error("Yetersiz bakiye.");
+                              transaction.update(userRef, { points: userDoc.data().points - totalCost });
+                         }
+                         
+                         const newTaskRef = doc(collection(db, "tasks"));
+                         newTaskId = newTaskRef.id;
+                         transaction.set(newTaskRef, { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: currentUser.uid, isFeatured: false, featureExpiresAt: null, isManagerTask: isManager });
+                     }); 
+                     hideModal();
+                     showFeatureTaskModal(newTaskId);
+                 } catch(error) { showAlert('Hata', 'Görev oluşturulurken bir hata oluştu: ' + error.message); }
+             } } ], formHTML);
+             
+             const rewardInput = document.getElementById('user-task-reward'), limitInput = document.getElementById('user-task-limit'), costDisplay = document.getElementById('total-cost-display'), confirmBtn = document.getElementById('confirm-create-task-btn');
+             
+             function updateCost() { 
+                 const reward = parseFloat(rewardInput.value) || 0, limit = parseInt(limitInput.value) || 0, totalCost = reward * limit; 
+                 costDisplay.textContent = `${totalCost.toFixed(2)} TL`; 
+                 
+                 if (isManager) {
+                     confirmBtn.classList.remove('btn-disabled');
+                     confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                 } else {
+                     confirmBtn.classList.toggle('btn-disabled', !(totalCost > 0 && currentUserBalance >= totalCost)); 
+                     confirmBtn.classList.toggle('opacity-50', !(totalCost > 0 && currentUserBalance >= totalCost)); 
+                     confirmBtn.classList.toggle('cursor-not-allowed', !(totalCost > 0 && currentUserBalance >= totalCost)); 
+                 }
+             }
+             rewardInput.addEventListener('input', updateCost); 
+             limitInput.addEventListener('input', updateCost);
+             updateCost(); // İlk yüklemede çalıştır
         }
 
-
-        async function checkSpinAvailability() {
-            if (!currentUser) return;
-            spinBtn.disabled = true; spinBtn.classList.add('btn-disabled');
-            const userRef = doc(db, "users", currentUser.uid);
-            const userDoc = await getDoc(userRef); const userData = userDoc.data();
-            const lastSpin = userData.lastSpinTimestamp || 0; const now = Date.now(); const oneDay = 24 * 60 * 60 * 1000;
-            if (now - lastSpin < oneDay) {
-                spinBtn.classList.add('hidden'); wheelCountdown.classList.remove('hidden');
-                if (countdownInterval) clearInterval(countdownInterval);
-                countdownInterval = setInterval(() => {
-                    const remaining = oneDay - (Date.now() - lastSpin);
-                    if (remaining <= 0) {
-                        clearInterval(countdownInterval); wheelCountdown.classList.add('hidden'); spinBtn.classList.remove('hidden', 'btn-disabled'); spinBtn.disabled = false;
-                    } else {
-                        const h = Math.floor(remaining / 3600000), m = Math.floor((remaining % 3600000) / 60000), s = Math.floor((remaining % 60000) / 1000);
-                        wheelCountdown.textContent = `Sonraki hak: ${h}s ${m}d ${s}s`;
-                    }
-                }, 1000);
-            } else {
-                if (countdownInterval) clearInterval(countdownInterval);
-                wheelCountdown.classList.add('hidden'); spinBtn.classList.remove('hidden', 'btn-disabled'); spinBtn.disabled = false;
-            }
-        }
-
-        async function spinWheel() {
-            spinBtn.disabled = true; spinBtn.classList.add('btn-disabled');
-            const prizeIndex = Math.floor(Math.random() * wheelPrizes.length); const prize = wheelPrizes[prizeIndex];
-            const totalRotation = (360 * 5) + (360 - (prizeIndex * sliceAngle) - (sliceAngle / 2));
-            
-            wheel.style.transform = `rotate(${totalRotation}deg)`;
-            setTimeout(async () => {
-                showAlert('Tebrikler!', `${prize} TL kazandınız! Bakiye güncellendi.`);
-                const userRef = doc(db, "users", currentUser.uid);
-                await runTransaction(db, async (transaction) => {
-                    const sfDoc = await transaction.get(userRef); if (!sfDoc.exists()) throw "User does not exist!";
-                    transaction.update(userRef, { points: (sfDoc.data().points || 0) + prize, lastSpinTimestamp: Date.now() });
-                });
-                
-                const finalRotation = (360 - (prizeIndex * sliceAngle)) - (sliceAngle / 2);
-                wheel.style.transition = 'none'; 
-                wheel.style.transform = `rotate(${finalRotation}deg)`;
-                setTimeout(() => { wheel.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)'; }, 50);
-
-                checkSpinAvailability();
-            }, 5200); 
-        }
-        
-        async function showReferralModal() {
-            if (!currentUserData) {
-                showAlert('Hata', 'Kullanıcı verisi henüz yüklenmedi. Lütfen bir saniye bekleyin.');
-                return;
-            }
-            
-            referralCodeDisplay.value = currentUserData.referralCode || 'Kod oluşturuluyor...';
-
-            totalReferralEarningsDisplay.textContent = `${(currentUserData.referralEarnings || 0).toFixed(2)} TL`;
-            
-            const q = query(collection(db, "users"), where("referrerId", "==", currentUser.uid));
-            const querySnapshot = await getDocs(q);
-            totalReferralsDisplay.textContent = querySnapshot.size;
-            
-            referralModal.classList.remove('hidden');
-        }
-
-        function openHowItWorksModal() {
-            howItWorksModal.classList.remove('hidden');
-            updatePagination(0); 
-        }
-
-        function closeHowItWorksModal() {
-            howItWorksModal.classList.add('hidden');
-            cardSlider.scrollLeft = 0; 
-        }
-        
-        function updatePagination(index) {
-            const dots = modalPagination.querySelectorAll('.dot');
-            dots.forEach((dot, i) => {
-                if (i === index) {
-                    dot.classList.remove('bg-gray-600');
-                    dot.classList.add('bg-indigo-500');
-                } else {
-                    dot.classList.remove('bg-indigo-500');
-                    dot.classList.add('bg-gray-600');
-                }
-            });
-        }
-        
-        cardSlider.addEventListener('scroll', () => {
-            const scrollLeft = cardSlider.scrollLeft;
-            const cardWidth = cardSlider.clientWidth;
-            const currentCardIndex = Math.round(scrollLeft / cardWidth);
-            updatePagination(currentCardIndex);
-        });
-
-        // --- YÖNETİCİ İŞLEVLERİ ---
-        function listenToAllUsers() {
-            const usersCollection = collection(db, "users");
-            onSnapshot(usersCollection, (querySnapshot) => {
-                allUsers = [];
-                querySnapshot.forEach((doc) => {
-                    allUsers.push({ id: doc.id, ...doc.data() });
-                });
-                renderUserList(allUsers);
-                // Eğer yönetici modalı açıksa, seçili kullanıcının verisini güncelle
-                if (selectedUser && adminUserModal.classList.contains('hidden') === false) {
-                    const updatedUser = allUsers.find(u => u.id === selectedUser.id);
-                    if (updatedUser) {
-                        selectedUser = updatedUser;
-                        updateAdminUserModalDetails(selectedUser);
-                    }
-                }
-            });
-        }
-        
-        function renderUserList(users) {
-            adminUserList.innerHTML = '';
-            if (users.length === 0) {
-                adminUserList.innerHTML = '<p class="text-center text-gray-400">Kullanıcı bulunamadı.</p>';
-                return;
-            }
-            
-            users.sort((a, b) => b.points - a.points); 
-
-            users.forEach((user) => {
-                const row = document.createElement('div');
-                row.className = `admin-user-row bg-gray-900 p-3 rounded-md flex justify-between items-center border ${user.isBanned ? 'border-red-500' : 'border-gray-700'}`;
-                row.dataset.uid = user.id;
-
-                const statusColor = user.isBanned ? 'text-red-400' : 'text-green-400';
-                const statusText = user.isBanned ? 'YASAKLI' : 'AKTİF';
-
-                row.innerHTML = `
-                    <div>
-                        <p class="font-semibold text-white">${user.email}</p>
-                        <p class="text-sm text-gray-400">Puan: ${user.points ? user.points.toFixed(2) : '0.00'} TL</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-xs font-bold ${statusColor}">${statusText}</span>
-                        <p class="text-xs text-gray-500">UID: ${user.id.substring(0, 8)}...</p>
-                    </div>
-                `;
-                adminUserList.appendChild(row);
-            });
-        }
-        
-        function updateAdminUserModalDetails(user) {
-            const banBtn = adminToggleBanBtn;
-            
-            banBtn.textContent = user.isBanned ? 'Yasağı Kaldır (Unban)' : 'Kullanıcıyı Yasakla (Ban)';
-            banBtn.classList.toggle('bg-red-600', !user.isBanned);
-            banBtn.classList.toggle('bg-green-600', user.isBanned);
-            banBtn.classList.toggle('hover:bg-red-700', !user.isBanned);
-            banBtn.classList.toggle('hover:bg-green-700', user.isBanned);
-            
-            const banStatus = user.isBanned ? `<span class="text-red-400 font-bold">YASAKLI</span>` : `<span class="text-green-400 font-bold">AKTİF</span>`;
-            
-            adminUserDetails.innerHTML = `
-                <p class="text-gray-300"><span class="font-semibold">UID:</span> <span class="font-mono text-sm text-gray-400">${user.id}</span></p>
-                <p class="text-gray-300"><span class="font-semibold">Mevcut Bakiye:</span> <span id="modal-current-balance" class="text-green-400 text-xl font-bold">${user.points.toFixed(2)} TL</span></p>
-                <p class="text-gray-300"><span class="font-semibold">Durum:</span> ${banStatus}</p>
-                <p class="text-gray-300"><span class="font-semibold">Referans Kodu:</span> ${user.referralCode || 'Yok'}</p>
-            `;
-        }
-        
-        // --- EVENT LISTENERS ---
+        // --- AUTH KISMI ---
 
         registerBtn.addEventListener('click', async () => {
             const email = emailInput.value; 
@@ -1198,16 +1335,17 @@
             let referrerId = null;
 
             try {
-                // IP Kontrolü (Simülasyon, gerçek bir IP servisi gerektirir)
+                 // IP Kontrolü (Simülasyon amaçlı, production'da sunucuda yapılmalı)
                 const ipResponse = await fetch('https://api.ipify.org?format=json');
                 if (!ipResponse.ok) throw new Error('IP adresi alınamadı. Lütfen tekrar deneyin.');
                 const ipData = await ipResponse.json();
                 const userIp = ipData.ip;
                 
+                // IP Kontrolü (Sadece aynı IP'den tek kayıt)
                 const ipQuery = query(collection(db, "users"), where("registrationIp", "==", userIp));
                 const ipSnapshot = await getDocs(ipQuery);
                 if (!ipSnapshot.empty) {
-                    throw new Error('Bu IP adresi ile daha önce bir hesap oluşturulmuş. Her IP adresi ile sadece bir hesap oluşturulabilir.');
+                     throw new Error('Bu IP adresi ile daha önce bir hesap oluşturulmuş. Her IP adresi ile sadece bir hesap oluşturulabilir.');
                 }
 
                 // Referans Kodu Kontrolü
@@ -1231,7 +1369,7 @@
                     points: 0,
                     lastSpinTimestamp: 0,
                     registrationIp: userIp,
-                    referralCode: generateReferralCode(), 
+                    referralCode: generateReferralCode(),
                     referralEarnings: 0,
                     isBanned: false
                 };
@@ -1259,50 +1397,48 @@
             loadingScreen.classList.remove('hidden');
             try { 
                 await signInWithEmailAndPassword(auth, email, password); 
+                // onAuthStateChanged ban kontrolünü yapar
             } 
             catch (error) { 
                 showAlert('Giriş Hatası', 'E-posta veya şifre hatalı.'); 
             } 
-            finally { 
-                loadingScreen.classList.add('hidden'); 
-            }
+            finally { loadingScreen.classList.add('hidden'); }
         });
 
         logoutBtn.addEventListener('click', () => signOut(auth));
         
-        // GÖRÜNÜM DEĞİŞTİRME
-        myTasksLink.addEventListener('click', (e) => { e.preventDefault(); closeSlider(); setView('my-tasks'); });
-        
-        howItWorksLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeSlider();
-            openHowItWorksModal();
-        });
-        howItWorksModalCloseBtn.addEventListener('click', closeHowItWorksModal);
-        
-        
-        // GÖREVLER
-        tasksContainer.addEventListener('click', (e) => { 
-            const target = e.target;
-            if (target.classList.contains('do-task-btn')) showUploadPrompt(target.dataset.id); 
-            else if (target.classList.contains('feature-task-btn')) showFeatureTaskModal(target.dataset.id); 
-        });
-        
-        
+        // --- OLAY DİNLEYİCİLERİ ---
+
+        // Genel görev listesi tıklamaları (Hem Aktif hem de Öne Çıkan)
+        function initializeTaskListeners(listElement) {
+             listElement.addEventListener('click', (e) => { 
+                const doTaskBtn = e.target.closest('.do-task-btn');
+                if (doTaskBtn) { 
+                     showUploadPrompt(doTaskBtn.dataset.id); 
+                }
+                
+                const featureTaskBtn = e.target.closest('.feature-task-btn');
+                if (featureTaskBtn && !featureTaskBtn.disabled) {
+                    showFeatureTaskModal(featureTaskBtn.dataset.id);
+                }
+             });
+        }
+        initializeTaskListeners(tasksList);
+        initializeTaskListeners(featuredTasksList);
+
         createTaskBtn.addEventListener('click', showCreateTaskModal);
-        
-        // SLIDER MENÜ
         menuToggleBtn.addEventListener('click', openSlider);
         sliderMenuOverlay.addEventListener('click', closeSlider);
         sliderCloseBtn.addEventListener('click', closeSlider);
+        
         whatsappSupportLink.addEventListener('click', (e) => { e.preventDefault(); window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank'); closeSlider(); });
         
-        // ŞANSLI ÇARK
+        // Çark
         luckyWheelLink.addEventListener('click', (e) => { e.preventDefault(); checkSpinAvailability(); wheelModal.classList.remove('hidden'); closeSlider(); });
         wheelModalCloseBtn.addEventListener('click', () => wheelModal.classList.add('hidden'));
         spinBtn.addEventListener('click', spinWheel);
         
-        // REFERANS SİSTEMİ
+        // Referans
         referralLink.addEventListener('click', (e) => { e.preventDefault(); showReferralModal(); closeSlider(); });
         referralModalCloseBtn.addEventListener('click', () => referralModal.classList.add('hidden'));
         copyReferralBtn.addEventListener('click', () => {
@@ -1312,53 +1448,98 @@
             setTimeout(() => { copyReferralBtn.textContent = 'Kopyala'; }, 2000);
         });
         
-        // YÖNETİCİ İŞLEMLERİ
-        adminAddTaskBtn.addEventListener('click', async () => {
-            const title = adminTaskTitle.value, points = parseFloat(adminTaskPoints.value), link = adminTaskLink.value, limit = parseInt(adminTaskLimit.value);
-            if (!title || !points || !link || !limit || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
-            try {
-                await addDoc(collection(db, "tasks"), { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: ADMIN_UID, isFeatured: false, featureExpiresAt: null });
-                showAlert('Başarılı', 'Yeni görev eklendi.');
-                adminTaskTitle.value = ''; adminTaskPoints.value = ''; adminTaskLink.value = ''; adminTaskLimit.value = '';
-            } catch (error) { showAlert('Hata', 'Görev eklenirken bir sorun oluştu: ' + error.message); }
-        });
+        // Nasıl Çalışır
+        howItWorksLink.addEventListener('click', (e) => { e.preventDefault(); howItWorksModal.classList.remove('hidden'); closeSlider(); });
+        howItWorksModalCloseBtn.addEventListener('click', () => howItWorksModal.classList.add('hidden'));
         
-        adminTasksList.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('admin-delete-task-btn')) {
-                const taskId = e.target.dataset.id;
-                showModal('Görevi Sil', 'Bu görevi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.', [
-                    { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
-                    { text: 'Evet, Sil', class: 'btn btn-secondary text-white font-bold py-2 px-4 rounded-md', onClick: async () => { await deleteDoc(doc(db, "tasks", taskId)); showAlert('Başarılı', 'Görev silindi.'); }}
-                ]);
+        // --- ÇARK MANTIĞI ---
+        async function checkSpinAvailability() {
+            if (!currentUser) return;
+            spinBtn.disabled = true; spinBtn.classList.add('btn-disabled');
+            
+            const userRef = doc(db, "users", currentUser.uid);
+            const userDoc = await getDoc(userRef); 
+            const userData = userDoc.data();
+            
+            const lastSpin = userData.lastSpinTimestamp || 0; 
+            const now = Date.now(); 
+            const oneDay = 24 * 60 * 60 * 1000;
+            
+            if (now - lastSpin < oneDay) {
+                spinBtn.classList.add('hidden'); 
+                wheelCountdown.classList.remove('hidden');
+                
+                if (countdownInterval) clearInterval(countdownInterval);
+                
+                countdownInterval = setInterval(() => {
+                    const remaining = oneDay - (Date.now() - lastSpin);
+                    if (remaining <= 0) {
+                        clearInterval(countdownInterval); 
+                        wheelCountdown.classList.add('hidden'); 
+                        spinBtn.classList.remove('hidden', 'btn-disabled'); 
+                        spinBtn.disabled = false;
+                    } else {
+                        const h = Math.floor(remaining / 3600000), m = Math.floor((remaining % 3600000) / 60000), s = Math.floor((remaining % 60000) / 1000);
+                        wheelCountdown.textContent = `Sonraki hak: ${h}s ${m}d ${s}s`;
+                    }
+                }, 1000);
+            } else {
+                if (countdownInterval) clearInterval(countdownInterval);
+                wheelCountdown.classList.add('hidden'); 
+                spinBtn.classList.remove('hidden', 'btn-disabled'); 
+                spinBtn.disabled = false;
             }
-        });
+        }
 
-        // YÖNETİCİ KULLANICI YÖNETİMİ EVENTLERİ
-        userSearchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const filteredUsers = allUsers.filter(user => 
-                user.email.toLowerCase().includes(query) || 
-                user.id.toLowerCase().includes(query)
-            );
-            renderUserList(filteredUsers);
-        });
+        async function spinWheel() {
+            spinBtn.disabled = true; spinBtn.classList.add('btn-disabled');
+            
+            const prizeIndex = Math.floor(Math.random() * wheelPrizes.length); 
+            const prize = wheelPrizes[prizeIndex];
+            
+            // Çarkın hedef açısı
+            const targetRotation = (360 - (prizeIndex * sliceAngle)) - (sliceAngle / 2);
+            // Birden fazla tam tur atmasını sağlayarak dramatikleştir
+            const totalRotation = (360 * (Math.floor(Math.random() * 5) + 5)) + targetRotation;
+            
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+            
+            setTimeout(async () => {
+                showAlert('Tebrikler!', `${prize} TL kazandınız! Bakiye güncellendi.`);
+                
+                const userRef = doc(db, "users", currentUser.uid);
+                await runTransaction(db, async (transaction) => {
+                    const sfDoc = await transaction.get(userRef); 
+                    if (!sfDoc.exists()) throw "User does not exist!";
+                    transaction.update(userRef, { points: (sfDoc.data().points || 0) + prize, lastSpinTimestamp: Date.now() });
+                });
+                
+                // Animasyonu sıfırla ve yeniden etkinleştir
+                wheel.style.transition = 'none'; 
+                wheel.style.transform = `rotate(${targetRotation}deg)`;
+                setTimeout(() => { wheel.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)'; }, 50);
+                
+                checkSpinAvailability();
+            }, 5200); // Animasyon süresinden biraz daha uzun
+        }
 
-        adminUserList.addEventListener('click', (e) => {
-            const row = e.target.closest('.admin-user-row');
-            if (!row) return;
-
-            const uid = row.dataset.uid;
-            selectedUser = allUsers.find(u => u.id === uid);
-
-            if (selectedUser) {
-                openAdminUserModal(selectedUser);
-            }
-        });
-        
-        adminUserModalCloseBtn.addEventListener('click', () => {
-            adminUserModal.classList.add('hidden');
-            selectedUser = null;
-        });
+        // --- REFERANS MANTIĞI ---
+        async function showReferralModal() {
+             if (!currentUserData) {
+                 showAlert('Bekleniyor', 'Kullanıcı verileri yükleniyor, lütfen kısa süre bekleyin.');
+                 return;
+             }
+             
+             referralCodeDisplay.value = currentUserData.referralCode || 'Kod oluşturuluyor...';
+             totalReferralEarningsDisplay.textContent = `${(currentUserData.referralEarnings || 0).toFixed(2)} TL`;
+             
+             // Davet edilen kullanıcı sayısını bul
+             const q = query(collection(db, "users"), where("referrerId", "==", currentUser.uid));
+             const querySnapshot = await getDocs(q);
+             totalReferralsDisplay.textContent = querySnapshot.size;
+             
+             referralModal.classList.remove('hidden');
+        }
 
     </script>
 </body>
