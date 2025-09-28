@@ -584,6 +584,10 @@
         // --- GLOBAL STATE ---
         let currentUser = null, currentUserData = null, currentUserBalance = 0, unsubscribeTasks = null, unsubscribeAdminTasks = null, unsubscribeUser = null, unsubscribeMyTasks = null, unsubscribeAllUsers = null, countdownInterval = null, currentView = 'tasks', allUsers = [];
 
+        // Çark Ödülleri ve Açıları (Hata Çözümü: Tanımlar buraya taşındı)
+        const wheelPrizes = [5, 1, 3, 2, 4, 1, 3, 2];
+        const sliceAngle = 360 / wheelPrizes.length;
+
         // DOM Elementleri...
         const loadingScreen = document.getElementById('loading-screen'), authScreen = document.getElementById('auth-screen'), mainAppScreen = document.getElementById('main-app-screen'), adminPanel = document.getElementById('admin-panel'), emailInput = document.getElementById('email-input'), passwordInput = document.getElementById('password-input'), registerBtn = document.getElementById('register-btn'), referralCodeInput = document.getElementById('referral-code-input'), loginBtn = document.getElementById('login-btn'), logoutBtn = document.getElementById('logout-btn'), userEmailDisplay = document.getElementById('user-email-display'), userPointsDisplay = document.getElementById('user-points-display'), tasksList = document.getElementById('tasks-list'), featuredTasksList = document.getElementById('featured-tasks-list'), createTaskBtn = document.getElementById('create-task-btn'), modal = document.getElementById('modal'), modalTitle = document.getElementById('modal-title'), modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons'), modalCustomContent = document.getElementById('modal-custom-content'), menuToggleBtn = document.getElementById('menu-toggle-btn'), sliderMenu = document.getElementById('slider-menu'), sliderMenuOverlay = document.getElementById('slider-menu-overlay'), sliderCloseBtn = document.getElementById('slider-close-btn'), whatsappSupportLink = document.getElementById('whatsapp-support-link'), luckyWheelLink = document.getElementById('lucky-wheel-link'), wheelModal = document.getElementById('wheel-modal'), wheelModalCloseBtn = document.getElementById('wheel-modal-close-btn'), wheel = document.getElementById('wheel'), spinBtn = document.getElementById('spin-btn'), wheelCountdown = document.getElementById('wheel-countdown'), referralLink = document.getElementById('referral-link'), referralModal = document.getElementById('referral-modal'), referralModalCloseBtn = document.getElementById('referral-modal-close-btn'), referralCodeDisplay = document.getElementById('referral-code-display'), copyReferralBtn = document.getElementById('copy-referral-btn'), totalReferralsDisplay = document.getElementById('total-referrals-display'), totalReferralEarningsDisplay = document.getElementById('total-referral-earnings-display'), howItWorksLink = document.getElementById('how-it-works-link'), howItWorksModal = document.getElementById('how-it-works-modal'), howItWorksModalCloseBtn = document.getElementById('how-it-works-modal-close-btn'), cardSlider = document.getElementById('card-slider'), modalPagination = document.getElementById('modal-pagination'), myTasksLink = document.getElementById('my-tasks-link'), myTasksContainer = document.getElementById('my-tasks-container'), myTasksList = document.getElementById('my-tasks-list'), tasksContainer = document.getElementById('tasks-container'), adminUserModal = document.getElementById('admin-user-modal'), adminUserModalCloseBtn = document.getElementById('admin-user-modal-close-btn');
 
@@ -741,6 +745,7 @@
                 authScreen.classList.remove('hidden');
                 mainAppScreen.classList.add('hidden');
                 
+                // Çıkış yapıldığında tüm dinleyicileri kapat (Stabilite)
                 if (unsubscribeTasks) unsubscribeTasks();
                 if (unsubscribeAdminTasks) unsubscribeAdminTasks();
                 if (unsubscribeUser) unsubscribeUser();
@@ -966,8 +971,6 @@
 
         } // End of initializeAdminListeners
 
-        // ... (Diğer fonksiyonlar burada devam eder)
-
         // --- ÇARK KODU ---
         function createWheelSlices() {
             wheel.innerHTML = '';
@@ -1008,7 +1011,7 @@
                         
                         // Yönetici girişi yapıldığına dair emin olmak için yeniden başlatma
                         // Bu kontrol, navigasyon sırasında event listenerların kaybolmasını önler.
-                        if (!document.getElementById('admin-users-tab').onclick) {
+                        if (document.getElementById('admin-users-tab') && !document.getElementById('admin-users-tab').onclick) {
                              initializeAdminListeners();
                         }
                     } else {
@@ -1123,7 +1126,7 @@
             card.innerHTML = `
                 <div>
                     <h3 class="text-xl font-bold text-indigo-300">${task.title}</h3>
-                    <p class="text-green-400 font-semibold my-2">${task.points.toFixed(2)} TL</p>
+                    <p class="text-green-400 font-semibold my-2">${task.points.toFixed(2)} TL}</p>
                     <p class="text-sm text-gray-400 mb-4">Link: <a href="${task.link}" target="_blank" class="text-blue-400 hover:underline">Görevi Aç</a></p>
                 </div>
                 <div class="mt-auto">
