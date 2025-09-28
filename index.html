@@ -413,10 +413,12 @@
                 } else {
                     adminPanel.classList.add('hidden');
                 }
+                // Kullanıcı verilerini dinlemeye başla ve currentUserData'yı sürekli güncelle
                 listenToUserData(user.uid);
                 listenToTasks(user.uid);
             } else {
                 currentUser = null;
+                currentUserData = null; // Veri sıfırlandı
                 authScreen.classList.remove('hidden');
                 mainAppScreen.classList.add('hidden');
                 adminPanel.classList.add('hidden');
@@ -436,6 +438,11 @@
                     currentUserBalance = currentUserData.points || 0;
                     userPointsDisplay.textContent = currentUserBalance.toFixed(2);
                     createTaskBtn.classList.toggle('hidden', currentUserBalance < MINIMUM_BALANCE_TO_CREATE_TASK);
+                } else {
+                    // Kullanıcı verisi yoksa (olmamalı ama güvenli olması için)
+                    currentUserData = null;
+                    currentUserBalance = 0;
+                    userPointsDisplay.textContent = "0.00";
                 }
             });
         }
@@ -772,8 +779,17 @@
         }
         
         async function showReferralModal() {
-            if (!currentUserData) return;
+            // Kontrol: Kullanıcı verisi yüklendi mi?
+            if (!currentUserData) {
+                showAlert('Hata', 'Kullanıcı verisi henüz yüklenmedi. Lütfen bir saniye bekleyin.');
+                return;
+            }
+            
+            // Referans kodunu güvenli bir şekilde currentUserData'dan al.
+            // Eğer kod yoksa (ki register'da oluşturuluyor olmalı), bir fallback göster.
             referralCodeDisplay.value = currentUserData.referralCode || 'Kod oluşturuluyor...';
+
+            // Kazanç ve davet sayısını güncelle
             totalReferralEarningsDisplay.textContent = `${(currentUserData.referralEarnings || 0).toFixed(2)} TL`;
             
             // Davet edilen kullanıcı sayısını bul
@@ -832,7 +848,7 @@
                     points: 0,
                     lastSpinTimestamp: 0,
                     registrationIp: userIp,
-                    referralCode: generateReferralCode(),
+                    referralCode: generateReferralCode(), // Referans kodu burada üretiliyor
                     referralEarnings: 0
                 };
                 if (referrerId) {
