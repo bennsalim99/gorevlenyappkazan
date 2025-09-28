@@ -7,10 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827; /* Koyu gri arka plan */
             color: #f3f4f6;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #4c1d95);
+            background-size: 400% 400%;
+            animation: gradientAnimation 12s ease infinite;
         }
         .task-card {
             background-color: #1f2937;
@@ -20,6 +27,10 @@
         .task-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .featured-card {
+            border-color: #f59e0b; /* amber-500 */
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
         }
         .btn {
             transition: background-color 0.2s, transform 0.2s;
@@ -43,13 +54,154 @@
             background-color: #4b5563;
             cursor: not-allowed;
         }
-        /* Gizli ve görünür durumlar için yardımcı sınıflar */
-        .hidden {
-            display: none;
+        .hidden { display: none; }
+
+        /* Şanslı Çark Stilleri */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #f59e0b; /* amber-500 */
+            z-index: 10;
+        }
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 8px solid #374151; /* gray-700 */
+            transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .slice {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            padding-right: 20px;
+        }
+        /* Dilim renkleri ve transformasyonları */
+        .slice:nth-child(1) { transform: rotate(0deg) skewY(-45deg); background: #ef4444; } /* red-500 */
+        .slice:nth-child(2) { transform: rotate(45deg) skewY(-45deg); background: #3b82f6; } /* blue-500 */
+        .slice:nth-child(3) { transform: rotate(90deg) skewY(-45deg); background: #22c55e; } /* green-500 */
+        .slice:nth-child(4) { transform: rotate(135deg) skewY(-45deg); background: #eab308; } /* yellow-500 */
+        .slice:nth-child(5) { transform: rotate(180deg) skewY(-45deg); background: #8b5cf6; } /* violet-500 */
+        .slice:nth-child(6) { transform: rotate(225deg) skewY(-45deg); background: #ec4899; } /* pink-500 */
+        .slice:nth-child(7) { transform: rotate(270deg) skewY(-45deg); background: #14b8a6; } /* teal-500 */
+        .slice:nth-child(8) { transform: rotate(315deg) skewY(-45deg); background: #f97316; } /* orange-500 */
+        .slice span {
+            /* Dilim içeriğini düzeltmek için ters transformasyon */
+            transform: skewY(45deg) rotate(22.5deg);
         }
     </style>
 </head>
 <body class="antialiased">
+
+    <!-- Kayar Yan Menü (Slider) -->
+    <div id="slider-menu-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-300"></div>
+    <div id="slider-menu" class="fixed top-0 left-0 h-full w-72 bg-gray-800 shadow-lg z-40 transform -translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="p-4 flex flex-col h-full">
+            <div>
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white">Menü</h2>
+                    <button id="slider-close-btn" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-md">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="#" id="referral-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                <span class="ml-3 font-semibold">Referans Sistemi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="lucky-wheel-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
+                               <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0L12 2.69z"></path><path d="M12 12l5.66 5.66"></path><path d="M12 12L6.34 6.34"></path><path d="M12 12l-5.66 5.66"></path><path d="M12 12l5.66-5.66"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                                <span class="ml-3 font-semibold">Şanslı Çark</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="whatsapp-support-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                <span class="ml-3 font-semibold">Destek Hattı</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Referans Modal -->
+    <div id="referral-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-md w-full border border-gray-700 relative">
+            <button id="referral-modal-close-btn" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold mb-4 text-center text-indigo-400">Referans Sistemi</h3>
+            <p class="text-center text-gray-400 mb-6">Arkadaşını davet et, o kazandıkça sen de kazan! Arkadaşının her kazancından %5 komisyon anında hesabında!</p>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-400 mb-2">Referans Kodunuz:</label>
+                <div class="flex">
+                    <input type="text" id="referral-code-display" readonly class="w-full p-3 bg-gray-700 rounded-l-md border border-gray-600 focus:outline-none font-mono text-lg tracking-widest">
+                    <button id="copy-referral-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-r-md">Kopyala</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-center">
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <p class="text-sm text-gray-400">Toplam Davet</p>
+                    <p id="total-referrals-display" class="text-2xl font-bold text-green-400">0</p>
+                </div>
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <p class="text-sm text-gray-400">Toplam Kazanç</p>
+                    <p id="total-referral-earnings-display" class="text-2xl font-bold text-green-400">0.00 TL</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Şanslı Çark Modal -->
+    <div id="wheel-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-md w-full border border-gray-700 relative">
+            <button id="wheel-modal-close-btn" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold mb-4 text-center text-amber-400">Şanslı Çark</h3>
+            <p class="text-center text-gray-400 mb-4">Günde bir kez çevirerek sürpriz ödüller kazanın!</p>
+            <div class="wheel-container">
+                <div class="pointer"></div>
+                <div id="wheel">
+                    <!-- 8 dilim -->
+                </div>
+            </div>
+            <div id="wheel-controls" class="text-center mt-6">
+                <button id="spin-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md text-lg">ÇEVİR</button>
+                <div id="wheel-countdown" class="hidden mt-4 text-lg font-semibold text-red-400"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Ana Konteyner -->
     <div id="app-container" class="container mx-auto p-4 md:p-6 max-w-4xl">
@@ -61,11 +213,12 @@
 
         <!-- Giriş ve Kayıt Ekranı -->
         <div id="auth-screen">
-            <div class="bg-gray-800 p-8 rounded-xl shadow-lg max-w-md mx-auto mt-16">
+            <div class="bg-gray-800 bg-opacity-70 backdrop-blur-sm p-8 rounded-xl shadow-lg max-w-md mx-auto mt-16 border border-gray-700">
                 <h1 class="text-3xl font-bold text-center mb-6 text-indigo-400">Hoş Geldiniz</h1>
                 <div class="space-y-4">
                     <input type="email" id="email-input" placeholder="E-posta Adresiniz" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <input type="password" id="password-input" placeholder="Şifreniz" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="referral-code-input" placeholder="Referans Kodu (isteğe bağlı)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <div class="flex flex-col md:flex-row gap-4">
                         <button id="login-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md">Giriş Yap</button>
                         <button id="register-btn" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-md">Kayıt Ol</button>
@@ -77,42 +230,63 @@
         <!-- Ana Uygulama Ekranı (Giriş yapıldıktan sonra) -->
         <div id="main-app-screen" class="hidden">
             <!-- Üst Bilgi Paneli -->
-            <header class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-gray-800 rounded-xl shadow-md">
-                <div class="text-lg">
-                    <span class="font-semibold">Kullanıcı:</span> <span id="user-email-display" class="font-mono"></span>
+            <header class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-gray-800 bg-opacity-70 backdrop-blur-sm rounded-xl shadow-md border border-gray-700">
+                <div class="flex items-center gap-4">
+                    <button id="menu-toggle-btn" class="p-2 rounded-md text-gray-400 hover:bg-gray-700 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                    <div class="text-lg">
+                        <span class="font-semibold">Kullanıcı:</span> <span id="user-email-display" class="font-mono"></span>
+                    </div>
                 </div>
                 <div class="text-2xl font-bold my-4 md:my-0">
                     Bakiye: <span id="user-points-display" class="text-green-400">0</span> TL
                 </div>
-                <div>
-                    <button id="create-task-btn" class="hidden btn btn-primary text-white font-bold py-2 px-4 rounded-md">Görev Oluştur (10 TL)</button>
-                    <button id="logout-btn" class="btn btn-secondary text-white font-bold py-2 px-4 rounded-md ml-4">Çıkış Yap</button>
+                <div class="flex flex-col md:flex-row gap-2">
+                    <button id="create-task-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Görev Oluştur</button>
+                    <button id="logout-btn" class="btn btn-secondary text-white font-bold py-2 px-4 rounded-md">Çıkış Yap</button>
                 </div>
             </header>
 
-            <!-- Görevler Listesi -->
+            <!-- Ana İçerik -->
             <main id="tasks-container">
-                <h2 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">Aktif Görevler</h2>
-                <div id="tasks-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Görev kartları buraya dinamik olarak eklenecek -->
+                <!-- Öne Çıkan Görevler -->
+                <div id="featured-tasks-section" class="mb-12">
+                    <h2 class="text-3xl font-bold mb-6 border-b-2 border-amber-500 pb-2 text-amber-400 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-amber-400"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                        Öne Çıkan Görevler
+                    </h2>
+                    <div id="featured-tasks-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Öne çıkan görev kartları buraya eklenecek -->
+                    </div>
+                </div>
+
+                <!-- Normal Görevler -->
+                <div>
+                    <h2 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">Aktif Görevler</h2>
+                    <div id="tasks-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Normal görev kartları buraya eklenecek -->
+                    </div>
                 </div>
             </main>
 
             <!-- Yönetici Paneli -->
-            <div id="admin-panel" class="hidden mt-16 bg-gray-800 p-8 rounded-xl shadow-lg">
+            <div id="admin-panel" class="hidden mt-16 bg-gray-800 bg-opacity-70 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-700">
                 <h2 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">Yönetici Paneli</h2>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Yeni Görev Ekleme Formu -->
                     <div>
                         <h3 class="text-2xl font-semibold mb-4">Yeni Görev Ekle</h3>
                         <div class="space-y-4">
                             <input type="text" id="admin-task-title" placeholder="Görev Başlığı (örn: Instagram Takip)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <input type="number" id="admin-task-points" placeholder="Kazanılacak Tutar (TL) (örn: 50)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="number" id="admin-task-points" placeholder="Kazanılacak Tutar (TL)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <input type="text" id="admin-task-link" placeholder="Görev Linki (örn: https://...)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <input type="number" id="admin-task-limit" placeholder="Görev Limiti (örn: 10)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <button id="admin-add-task-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md">Görevi Ekle</button>
                         </div>
                     </div>
+                    
                     <!-- Mevcut Görevler Listesi -->
                     <div>
                         <h3 class="text-2xl font-semibold mb-4">Mevcut Görevleri Yönet</h3>
@@ -121,13 +295,16 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Çekim Talepleri Bölümü KALDIRILDI -->
+                
             </div>
         </div>
     </div>
     
     <!-- Modal Penceresi -->
     <div id="modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-md w-full border border-gray-700">
             <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
             <div id="modal-custom-content"></div>
             <p id="modal-message" class="text-gray-300 mb-6"></p>
@@ -140,94 +317,54 @@
 
     <!-- Firebase SDK -->
     <script type="module">
-        // ÖNEMLİ: Bu uygulamayı kullanmak için bir Firebase projesi oluşturmanız gerekmektedir.
-        // 1. https://console.firebase.google.com/ adresine gidin ve yeni bir proje oluşturun.
-        // 2. Proje ayarlarından "Web" uygulaması ekleyin.
-        // 3. Firebase'in size verdiği `firebaseConfig` objesini aşağıdaki alana yapıştırın.
-        // 4. Firebase Authentication'ı aktif edin (E-posta/Şifre metodu).
-        // 5. Firestore Database oluşturun (Test modunda başlayabilirsiniz).
-        
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, deleteDoc, runTransaction, updateDoc, where, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // NOT: Bu config varsayılan bir yapıdadır. Gerçek bir uygulama için kendi Firebase projenizle değiştirilmelidir.
         const firebaseConfig = {
-            apiKey: "AIzaSyCaFqUggZuxgcs4RhzcV_fqzcyLBTJVXCs",
-            authDomain: "gorevkzn.firebaseapp.com",
-            projectId: "gorevkzn",
-            storageBucket: "gorevkzn.firebasestorage.app",
-            messagingSenderId: "465588867723",
-            appId: "1:465588867723:web:63e49dd17261c29e6eba8e",
-            measurementId: "G-2NPXKEM05Q"
+            apiKey: "AIzaSyCaFqUggZuxgcs4RhzcV_fqzcyLBTJVXCs",
+            authDomain: "gorevkzn.firebaseapp.com",
+            projectId: "gorevkzn",
+            storageBucket: "gorevkzn.firebasestorage.app",
+            messagingSenderId: "465588867723",
+            appId: "1:465588867723:web:63e49dd17261c29e6eba8e",
+            measurementId: "G-2NPXKEM05Q"
         };
         
-        // Bu UID'ye sahip kullanıcı yönetici olacaktır. Kayıt olduktan sonra kendi UserID'nizi buraya yapıştırın.
-        const ADMIN_UID = "bWzWd68FzLYcI9OMuYPdpvzbVIU2";
+        const ADMIN_UID = "bWzWd68FzLYcI9OMuYPdpvzbVIU2"; // YÖNETİCİ UID'si
         const WHATSAPP_NUMBER = "+639649516465";
-        const CREATE_TASK_COST = 10; // Görev oluşturma bedeli 10 TL
+        const MINIMUM_BALANCE_TO_CREATE_TASK = 1;
+        const REFERRAL_COMMISSION_RATE = 0.05; // %5 komisyon
+        // const MINIMUM_WITHDRAWAL_AMOUNT = 50; // Para çekme kaldırıldı
 
-
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            signOut, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc, 
-            getDoc,
-            collection,
-            addDoc,
-            onSnapshot,
-            query,
-            where,
-            deleteDoc,
-            runTransaction
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // Firebase başlatma
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // DOM Elementleri
-        const loadingScreen = document.getElementById('loading-screen');
-        const authScreen = document.getElementById('auth-screen');
-        const mainAppScreen = document.getElementById('main-app-screen');
-        const adminPanel = document.getElementById('admin-panel');
+        // DOM Elementleri...
+        const loadingScreen = document.getElementById('loading-screen'), authScreen = document.getElementById('auth-screen'), mainAppScreen = document.getElementById('main-app-screen'), adminPanel = document.getElementById('admin-panel'), emailInput = document.getElementById('email-input'), passwordInput = document.getElementById('password-input'), registerBtn = document.getElementById('register-btn'), referralCodeInput = document.getElementById('referral-code-input'), loginBtn = document.getElementById('login-btn'), logoutBtn = document.getElementById('logout-btn'), userEmailDisplay = document.getElementById('user-email-display'), userPointsDisplay = document.getElementById('user-points-display'), tasksList = document.getElementById('tasks-list'), featuredTasksList = document.getElementById('featured-tasks-list'), createTaskBtn = document.getElementById('create-task-btn'), adminTaskTitle = document.getElementById('admin-task-title'), adminTaskPoints = document.getElementById('admin-task-points'), adminTaskLink = document.getElementById('admin-task-link'), adminTaskLimit = document.getElementById('admin-task-limit'), adminAddTaskBtn = document.getElementById('admin-add-task-btn'), adminTasksList = document.getElementById('admin-tasks-list'), modal = document.getElementById('modal'), modalTitle = document.getElementById('modal-title'), modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons'), modalCustomContent = document.getElementById('modal-custom-content'), menuToggleBtn = document.getElementById('menu-toggle-btn'), sliderMenu = document.getElementById('slider-menu'), sliderMenuOverlay = document.getElementById('slider-menu-overlay'), sliderCloseBtn = document.getElementById('slider-close-btn'), whatsappSupportLink = document.getElementById('whatsapp-support-link'), luckyWheelLink = document.getElementById('lucky-wheel-link'), wheelModal = document.getElementById('wheel-modal'), wheelModalCloseBtn = document.getElementById('wheel-modal-close-btn'), wheel = document.getElementById('wheel'), spinBtn = document.getElementById('spin-btn'), wheelCountdown = document.getElementById('wheel-countdown'), referralLink = document.getElementById('referral-link'), referralModal = document.getElementById('referral-modal'), referralModalCloseBtn = document.getElementById('referral-modal-close-btn'), referralCodeDisplay = document.getElementById('referral-code-display'), copyReferralBtn = document.getElementById('copy-referral-btn'), totalReferralsDisplay = document.getElementById('total-referrals-display'), totalReferralEarningsDisplay = document.getElementById('total-referral-earnings-display'); // Para çekme elementleri KALDIRILDI
+
+        let currentUser = null, currentUserData = null, currentUserBalance = 0, unsubscribeTasks = null, unsubscribeAdminTasks = null, unsubscribeUser = null, countdownInterval = null; // unsubscribeWithdrawals KALDIRILDI
+
+        const wheelPrizes = [5, 1, 3, 2, 4, 1, 3, 2];
+        const sliceAngle = 360 / wheelPrizes.length;
         
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-        const loginBtn = document.getElementById('login-btn');
-        const registerBtn = document.getElementById('register-btn');
-        const logoutBtn = document.getElementById('logout-btn');
+        function createWheelSlices() {
+            wheel.innerHTML = '';
+            wheelPrizes.forEach((prize, index) => {
+                const slice = document.createElement('div');
+                slice.className = 'slice';
+                // CSS'deki nth-child ile renkler belirlendiği için burada sadece içeriği oluşturuyoruz
+                slice.innerHTML = `<span>${prize} TL</span>`;
+                // Manuel olarak transform ayarları (CSS'teki nth-child ile uyumlu olmalı)
+                slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-45deg)`; 
+
+                wheel.appendChild(slice);
+            });
+        }
+        createWheelSlices();
         
-        const userEmailDisplay = document.getElementById('user-email-display');
-        const userPointsDisplay = document.getElementById('user-points-display');
-        const tasksList = document.getElementById('tasks-list');
-        const createTaskBtn = document.getElementById('create-task-btn');
-
-        // Admin Panel Elementleri
-        const adminTaskTitle = document.getElementById('admin-task-title');
-        const adminTaskPoints = document.getElementById('admin-task-points');
-        const adminTaskLink = document.getElementById('admin-task-link');
-        const adminTaskLimit = document.getElementById('admin-task-limit');
-        const adminAddTaskBtn = document.getElementById('admin-add-task-btn');
-        const adminTasksList = document.getElementById('admin-tasks-list');
-
-        // Modal Elementleri
-        const modal = document.getElementById('modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalMessage = document.getElementById('modal-message');
-        const modalButtons = document.getElementById('modal-buttons');
-        const modalCustomContent = document.getElementById('modal-custom-content');
-
-        let currentUser = null;
-        let unsubscribeTasks = null;
-        let unsubscribeAdminTasks = null;
-        let unsubscribeUser = null;
-
-        // Modal fonksiyonları
         function showModal(title, message, buttons, customHTML = '') {
             modalTitle.textContent = title;
             modalMessage.textContent = message;
@@ -246,33 +383,38 @@
             });
             modal.classList.remove('hidden');
         }
-
-        function hideModal() {
-            modal.classList.add('hidden');
-        }
         
-        function showAlert(title, message) {
-            showModal(title, message, [{ text: 'Tamam', class: 'btn btn-primary px-4 py-2 rounded-md' }]);
+        function hideModal() { modal.classList.add('hidden'); }
+        
+        function showAlert(title, message) { showModal(title, message, [{ text: 'Tamam', class: 'btn btn-primary px-4 py-2 rounded-md' }]);}
+        
+        function openSlider() { sliderMenuOverlay.classList.remove('hidden'); sliderMenu.classList.remove('-translate-x-full'); }
+        
+        function closeSlider() { sliderMenuOverlay.classList.add('hidden'); sliderMenu.classList.add('-translate-x-full'); }
+        
+        function generateReferralCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
         }
 
-        // Kullanıcı durumunu dinle
         onAuthStateChanged(auth, user => {
             if (user) {
                 currentUser = user;
                 authScreen.classList.add('hidden');
                 mainAppScreen.classList.remove('hidden');
                 userEmailDisplay.textContent = user.email;
-
                 if (user.uid === ADMIN_UID) {
                     adminPanel.classList.remove('hidden');
                     listenToAdminTasks();
                 } else {
                     adminPanel.classList.add('hidden');
                 }
-
                 listenToUserData(user.uid);
                 listenToTasks(user.uid);
-
             } else {
                 currentUser = null;
                 authScreen.classList.remove('hidden');
@@ -284,62 +426,21 @@
             }
             loadingScreen.classList.add('hidden');
         });
-
+        
         function listenToUserData(uid) {
             if (unsubscribeUser) unsubscribeUser();
             const userDocRef = doc(db, "users", uid);
             unsubscribeUser = onSnapshot(userDocRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    const userData = docSnap.data();
-                    userPointsDisplay.textContent = userData.points || 0;
-                    if (userData.points >= CREATE_TASK_COST) {
-                        createTaskBtn.classList.remove('hidden');
-                    } else {
-                        createTaskBtn.classList.add('hidden');
-                    }
-                } else {
-                    setDoc(doc(db, "users", uid), { email: currentUser.email, points: 0 });
+                    currentUserData = docSnap.data();
+                    currentUserBalance = currentUserData.points || 0;
+                    userPointsDisplay.textContent = currentUserBalance.toFixed(2);
+                    createTaskBtn.classList.toggle('hidden', currentUserBalance < MINIMUM_BALANCE_TO_CREATE_TASK);
                 }
             });
         }
-        
-        function listenToTasks(uid) {
-            if (unsubscribeTasks) unsubscribeTasks();
-            const q = query(collection(db, "tasks"));
-            unsubscribeTasks = onSnapshot(q, (querySnapshot) => {
-                tasksList.innerHTML = '';
-                if (querySnapshot.empty) {
-                    tasksList.innerHTML = '<p class="col-span-full text-center text-gray-400">Şu an aktif görev bulunmuyor.</p>';
-                    return;
-                }
-                querySnapshot.forEach((doc) => {
-                    const task = { id: doc.id, ...doc.data() };
-                    if (task.completedCount >= task.limit) return;
-                    
-                    const userHasCompleted = task.completedBy && task.completedBy.includes(uid);
-                    
-                    const card = document.createElement('div');
-                    card.className = 'task-card p-6 rounded-lg shadow-md flex flex-col justify-between';
-                    card.innerHTML = `
-                        <div>
-                            <h3 class="text-xl font-bold text-indigo-300">${task.title}</h3>
-                            <p class="text-green-400 font-semibold my-2">${task.points} TL</p>
-                            <p class="text-sm text-gray-400 mb-4">Link: <a href="${task.link}" target="_blank" class="text-blue-400 hover:underline">Görevi Aç</a></p>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="w-full bg-gray-600 rounded-full h-2.5 mb-2">
-                                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: ${ (task.completedCount / task.limit) * 100}%"></div>
-                            </div>
-                            <p class="text-sm text-gray-400 mb-4">Kalan: ${task.limit - task.completedCount}/${task.limit}</p>
-                            <button data-id="${task.id}" class="w-full do-task-btn btn ${userHasCompleted ? 'btn-disabled' : 'btn-primary'} text-white font-bold py-2 px-4 rounded-md" ${userHasCompleted ? 'disabled' : ''}>
-                                ${userHasCompleted ? 'Tamamlandı' : 'Görevi Yap'}
-                            </button>
-                        </div>
-                    `;
-                    tasksList.appendChild(card);
-                });
-            });
-        }
+
+        // YÖNETİCİ ÇEKİM TALEPLERİNİ DİNLEME FONKSİYONU KALDIRILDI
         
         function listenToAdminTasks() {
              if (unsubscribeAdminTasks) unsubscribeAdminTasks();
@@ -366,6 +467,77 @@
             });
         }
 
+        function listenToTasks(uid) {
+            if (unsubscribeTasks) unsubscribeTasks();
+            const q = query(collection(db, "tasks"));
+            unsubscribeTasks = onSnapshot(q, (querySnapshot) => {
+                tasksList.innerHTML = '';
+                featuredTasksList.innerHTML = '';
+                
+                let normalTaskCount = 0;
+                let featuredTaskCount = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const task = { id: doc.id, ...doc.data() };
+                    if (task.completedCount >= task.limit) return;
+                    
+                    const card = createTaskCard(task, uid);
+                    // Firestore Timestamp nesnesini Date objesine çevirerek kontrol et
+                    const isFeatureActive = task.isFeatured && task.featureExpiresAt && (task.featureExpiresAt.toMillis() > Date.now());
+
+                    if (isFeatureActive) {
+                        card.classList.add('featured-card');
+                        featuredTasksList.appendChild(card);
+                        featuredTaskCount++;
+                    } else {
+                        tasksList.appendChild(card);
+                        normalTaskCount++;
+                    }
+                });
+
+                if (normalTaskCount === 0) tasksList.innerHTML = '<p class="col-span-full text-center text-gray-400">Şu an aktif görev bulunmuyor.</p>';
+                if (featuredTaskCount === 0) featuredTasksList.innerHTML = '<p class="col-span-full text-center text-gray-400">Şu an öne çıkan görev bulunmuyor.</p>';
+            });
+        }
+        
+        function createTaskCard(task, uid) {
+            const userHasCompleted = task.completedBy && task.completedBy.includes(uid);
+            const isOwnTask = task.createdBy === uid;
+            
+            const card = document.createElement('div');
+            card.className = 'task-card p-6 rounded-lg shadow-md flex flex-col justify-between';
+            
+            let buttonHTML = '';
+            if (isOwnTask) {
+                 // Kendi görevini öne çıkarma butonu eklendi
+                const featureBtnText = (task.isFeatured && task.featureExpiresAt.toMillis() > Date.now()) ? 'Öne Çıkarıldı' : 'Öne Çıkar';
+                const featureBtnClass = (task.isFeatured && task.featureExpiresAt.toMillis() > Date.now()) ? 'bg-amber-700 hover:bg-amber-800' : 'bg-amber-500 hover:bg-amber-600';
+                buttonHTML = `
+                    <button class="w-full btn ${featureBtnClass} text-white font-bold py-2 px-4 rounded-md feature-task-btn mt-2" data-id="${task.id}" ${featureBtnText === 'Öne Çıkarıldı' ? 'disabled' : ''}>${featureBtnText}</button>
+                `;
+            } else if (userHasCompleted) {
+                buttonHTML = `<button class="w-full btn btn-disabled text-white font-bold py-2 px-4 rounded-md" disabled>Tamamlandı</button>`;
+            } else {
+                buttonHTML = `<button data-id="${task.id}" class="w-full do-task-btn btn btn-primary text-white font-bold py-2 px-4 rounded-md">Görevi Yap</button>`;
+            }
+            
+            card.innerHTML = `
+                <div>
+                    <h3 class="text-xl font-bold text-indigo-300">${task.title}</h3>
+                    <p class="text-green-400 font-semibold my-2">${task.points.toFixed(2)} TL</p>
+                    <p class="text-sm text-gray-400 mb-4">Link: <a href="${task.link}" target="_blank" class="text-blue-400 hover:underline">Görevi Aç</a></p>
+                </div>
+                <div class="mt-auto">
+                    <div class="w-full bg-gray-600 rounded-full h-2.5 mb-2">
+                        <div class="bg-indigo-500 h-2.5 rounded-full" style="width: ${ (task.completedCount / task.limit) * 100}%"></div>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">Kalan: ${task.limit - task.completedCount}/${task.limit}</p>
+                    ${buttonHTML}
+                </div>
+            `;
+            return card;
+        }
+
         async function completeTaskTransaction(taskId) {
             try {
                 let earnedAmount = 0;
@@ -377,27 +549,41 @@
                     const userDoc = await transaction.get(userRef);
 
                     if (!taskDoc.exists()) throw new Error("Görev bulunamadı.");
-                    
-                    const taskData = taskDoc.data();
+                    if (!userDoc.exists()) throw new Error("Kullanıcı bulunamadı.");
+
+                    const taskData = taskDoc.data(); 
                     const userData = userDoc.data();
                     earnedAmount = taskData.points;
-
+                    
                     const completedBy = taskData.completedBy || [];
-                    if (completedBy.includes(currentUser.uid)) {
-                        throw new Error("Bu görevi daha önce tamamladınız.");
-                    }
-                    if (taskData.completedCount >= taskData.limit) {
-                        throw new Error("Bu görevin limiti dolmuştur.");
-                    }
-                    transaction.update(taskRef, {
-                        completedCount: taskData.completedCount + 1,
-                        completedBy: [...completedBy, currentUser.uid]
+                    if (completedBy.includes(currentUser.uid)) throw new Error("Bu görevi daha önce tamamladınız.");
+                    if (taskData.completedCount >= taskData.limit) throw new Error("Bu görevin limiti dolmuştur.");
+                    if (taskData.createdBy === currentUser.uid) throw new Error("Kendi görevinizi tamamlayamazsınız.");
+
+                    // Görevi tamamlayan kullanıcıya ödülü ekle
+                    transaction.update(userRef, { points: (userData.points || 0) + taskData.points });
+                    
+                    // Görev belgesini güncelle
+                    transaction.update(taskRef, { 
+                        completedCount: taskData.completedCount + 1, 
+                        completedBy: [...completedBy, currentUser.uid] 
                     });
-                    transaction.update(userRef, {
-                        points: (userData.points || 0) + taskData.points
-                    });
+
+                    // Referans komisyonunu işle
+                    if (userData.referrerId) {
+                        const commission = taskData.points * REFERRAL_COMMISSION_RATE;
+                        const referrerRef = doc(db, "users", userData.referrerId);
+                        const referrerDoc = await transaction.get(referrerRef);
+                        if (referrerDoc.exists()) {
+                             const referrerData = referrerDoc.data();
+                             transaction.update(referrerRef, {
+                                 points: (referrerData.points || 0) + commission,
+                                 referralEarnings: (referrerData.referralEarnings || 0) + commission
+                             });
+                        }
+                    }
                 });
-                showAlert('Başarılı!', `Görevi tamamladınız ve ${earnedAmount} TL kazandınız!`);
+                showAlert('Başarılı!', `Görevi tamamladınız ve ${earnedAmount.toFixed(2)} TL kazandınız!`);
             } catch (error) {
                 showAlert('Hata', error.message);
             }
@@ -408,13 +594,7 @@
             modalTitle.textContent = 'Kanıt Kontrol Ediliyor';
             modalMessage.textContent = '';
             modalButtons.innerHTML = '';
-            modalCustomContent.innerHTML = `
-                <div class="text-center">
-                    <p class="text-gray-300 mb-4">Lütfen bekleyin...</p>
-                    <div id="modal-countdown-timer" class="text-5xl font-bold text-green-400">${seconds}</div>
-                    <p class="text-gray-400 mt-2">saniye</p>
-                </div>`;
-            
+            modalCustomContent.innerHTML = `<div class="text-center"><p class="text-gray-300 mb-4">Lütfen bekleyin...</p><div id="modal-countdown-timer" class="text-5xl font-bold text-green-400">${seconds}</div><p class="text-gray-400 mt-2">saniye</p></div>`;
             const timerElement = document.getElementById('modal-countdown-timer');
             const interval = setInterval(() => {
                 seconds--;
@@ -428,183 +608,319 @@
         }
 
         function showUploadPrompt(taskId) {
-            const customHTML = `
-                <p class="text-gray-300 mb-4">Görevi tamamladığınıza dair kanıt (ekran görüntüsü) yükleyin.</p>
-                <input type="file" id="modal-file-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
-            `;
-            showModal(
-                'Görevi Onayla', '',
-                [
-                    { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
-                    { 
-                        text: 'Onayla & Başlat', 
-                        id: 'modal-confirm-upload', 
-                        class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md opacity-50 cursor-not-allowed',
-                        onClick: () => startCountdown(taskId),
-                        keepOpen: true
-                    }
-                ],
-                customHTML
-            );
-
+            // Basit bir dosya yükleme simülasyonu
+            const customHTML = `<p class="text-gray-300 mb-4">Görevi tamamladığınıza dair kanıt (ekran görüntüsü) yükleyin. (Simülasyon)</p><input type="file" id="modal-file-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>`;
+            showModal('Görevi Onayla', '', [ 
+                { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }, 
+                { text: 'Onayla & Başlat', id: 'modal-confirm-upload', class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md opacity-50 cursor-not-allowed', onClick: () => startCountdown(taskId), keepOpen: true } 
+            ], customHTML);
             const fileInput = document.getElementById('modal-file-input');
             const confirmBtn = document.getElementById('modal-confirm-upload');
             confirmBtn.disabled = true;
-
+            confirmBtn.classList.add('btn-disabled'); // Disable class'ını ekle
             fileInput.addEventListener('change', () => {
-                if (fileInput.files.length > 0) {
-                    confirmBtn.disabled = false;
-                    confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                } else {
-                    confirmBtn.disabled = true;
-                    confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                if (fileInput.files.length > 0) { 
+                    confirmBtn.disabled = false; 
+                    confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'btn-disabled'); 
+                } else { 
+                    confirmBtn.disabled = true; 
+                    confirmBtn.classList.add('opacity-50', 'cursor-not-allowed', 'btn-disabled'); 
                 }
             });
         }
-
-        // Olay dinleyicileri
-        registerBtn.addEventListener('click', async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            if (!email || !password) {
-                showAlert('Hata', 'Lütfen e-posta ve şifre alanlarını doldurun.');
-                return;
-            }
-            loadingScreen.classList.remove('hidden');
+        
+        async function featureTask(taskId, cost, durationInMs) {
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await setDoc(doc(db, "users", userCredential.user.uid), {
-                    email: email,
-                    points: 0
+                 await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    const taskRef = doc(db, "tasks", taskId);
+
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists() || (userDoc.data().points || 0) < cost) {
+                        throw new Error("Öne çıkarma işlemi için yetersiz bakiye.");
+                    }
+
+                    const newBalance = userDoc.data().points - cost;
+                    const expiryDate = new Date(Date.now() + durationInMs);
+
+                    transaction.update(userRef, { points: newBalance });
+                    transaction.update(taskRef, {
+                        isFeatured: true,
+                        featureExpiresAt: Timestamp.fromDate(expiryDate)
+                    });
                 });
+                showAlert('Başarılı!', 'Göreviniz başarıyla öne çıkarıldı!');
             } catch (error) {
-                console.error("Kayıt Hatası:", error);
-                let errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.";
-                if (error.code === 'auth/email-already-in-use') {
-                    errorMessage = 'Bu e-posta adresi zaten kullanılıyor.';
-                } else if (error.code === 'auth/weak-password') {
-                    errorMessage = 'Şifre en az 6 karakterli olmalıdır.';
-                } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = 'Geçersiz bir e-posta adresi girdiniz.';
+                showAlert('Hata', error.message);
+            }
+        }
+
+        function showFeatureTaskModal(taskId) {
+            const featureOptions = {
+                '1 Saat': { cost: 10, durationMs: 60 * 60 * 1000 },
+                '1 Gün': { cost: 100, durationMs: 24 * 60 * 60 * 1000 },
+                '1 Hafta': { cost: 700, durationMs: 7 * 24 * 60 * 60 * 1000 },
+                '1 Ay': { cost: 2500, durationMs: 30 * 24 * 60 * 60 * 1000 }
+            };
+
+            let buttonsHTML = '';
+            for (const [key, value] of Object.entries(featureOptions)) {
+                const isDisabled = currentUserBalance < value.cost;
+                const disabledClass = isDisabled ? 'btn-disabled opacity-50' : 'bg-amber-600 hover:bg-amber-700';
+                buttonsHTML += `<button ${isDisabled ? 'disabled' : ''} onclick="window.featureTaskGlobal('${taskId}', ${value.cost}, ${value.durationMs})" class="w-full btn ${disabledClass} text-white font-bold py-3 px-4 rounded-md">${key} (${value.cost.toFixed(2)} TL)</button>`;
+            }
+
+            const customHTML = `<div class="space-y-3">${buttonsHTML}</div>`;
+            showModal(
+                'Görevi Öne Çıkar', 
+                'Görevinizi daha fazla kişiye ulaştırmak için öne çıkarabilirsiniz. Mevcut Bakiyeniz: ' + currentUserBalance.toFixed(2) + ' TL',
+                [{ text: 'Kapat', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }],
+                customHTML
+            );
+        }
+        
+        // Global scope'a taşındı, modal içindeki onclick event'i için gerekli
+        window.featureTaskGlobal = async (taskId, cost, durationMs) => {
+             hideModal();
+             await featureTask(taskId, cost, durationMs);
+        };
+
+        function showCreateTaskModal() {
+             const formHTML = `<div class="space-y-4"><input type="text" id="user-task-title" placeholder="Görev Başlığı (örn: Instagram Takip)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"><input type="text" id="user-task-link" placeholder="Görev Linki (örn: https://...)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"><div class="flex gap-4"><input type="number" id="user-task-reward" placeholder="Kişi Başı Ödül (TL)" class="w-1/2 p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" min="0.1" step="0.1"><input type="number" id="user-task-limit" placeholder="Kişi Limiti" class="w-1/2 p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" min="1"></div><div class="bg-gray-900 p-3 rounded-md text-center"><p class="text-gray-400">Toplam Maliyet</p><p id="total-cost-display" class="text-2xl font-bold text-green-400">0 TL</p></div></div>`;
+             showModal('Yeni Görev Oluştur', '', [ { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }, { text: "Görevi Oluştur", id: 'confirm-create-task-btn', class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md btn-disabled', onClick: async () => {
+                const title = document.getElementById('user-task-title').value, link = document.getElementById('user-task-link').value, points = parseFloat(document.getElementById('user-task-reward').value), limit = parseInt(document.getElementById('user-task-limit').value), totalCost = points * limit;
+                if (!title || !link || !points || !limit || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
+                if (currentUserBalance < totalCost) { showAlert('Hata', 'Bu görevi oluşturmak için yeterli bakiyeniz yok. Görev maliyeti: ' + totalCost.toFixed(2) + ' TL'); return; }
+                try {
+                    let newTaskId;
+                    await runTransaction(db, async (transaction) => {
+                        const userRef = doc(db, "users", currentUser.uid); const userDoc = await transaction.get(userRef); if (!userDoc.exists() || (userDoc.data().points || 0) < totalCost) throw new Error("Yetersiz bakiye.");
+                        transaction.update(userRef, { points: userDoc.data().points - totalCost });
+                        const newTaskRef = doc(collection(db, "tasks"));
+                        newTaskId = newTaskRef.id;
+                        transaction.set(newTaskRef, { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: currentUser.uid, isFeatured: false, featureExpiresAt: null });
+                    }); 
+                    hideModal();
+                    showFeatureTaskModal(newTaskId);
+                } catch(error) { showAlert('Hata', 'Görev oluşturulurken bir hata oluştu: ' + error.message); }
+            } } ], formHTML);
+            const rewardInput = document.getElementById('user-task-reward'), limitInput = document.getElementById('user-task-limit'), costDisplay = document.getElementById('total-cost-display'), confirmBtn = document.getElementById('confirm-create-task-btn');
+            function updateCost() { 
+                const reward = parseFloat(rewardInput.value) || 0; 
+                const limit = parseInt(limitInput.value) || 0; 
+                const totalCost = reward * limit; 
+                costDisplay.textContent = `${totalCost.toFixed(2)} TL`; 
+                confirmBtn.disabled = !(totalCost > 0 && currentUserBalance >= totalCost);
+                confirmBtn.classList.toggle('btn-disabled', confirmBtn.disabled);
+                confirmBtn.classList.toggle('opacity-50', confirmBtn.disabled);
+                confirmBtn.classList.toggle('cursor-not-allowed', confirmBtn.disabled);
+            }
+            rewardInput.addEventListener('input', updateCost); 
+            limitInput.addEventListener('input', updateCost);
+        }
+
+        // PARA ÇEKME FONKSİYONLARI KALDIRILDI
+
+        async function checkSpinAvailability() {
+            if (!currentUser) return;
+            spinBtn.disabled = true; spinBtn.classList.add('btn-disabled');
+            const userRef = doc(db, "users", currentUser.uid);
+            const userDoc = await getDoc(userRef); const userData = userDoc.data();
+            const lastSpin = userData.lastSpinTimestamp || 0; const now = Date.now(); const oneDay = 24 * 60 * 60 * 1000;
+            if (now - lastSpin < oneDay) {
+                spinBtn.classList.add('hidden'); wheelCountdown.classList.remove('hidden');
+                if (countdownInterval) clearInterval(countdownInterval);
+                countdownInterval = setInterval(() => {
+                    const remaining = oneDay - (Date.now() - lastSpin);
+                    if (remaining <= 0) {
+                        clearInterval(countdownInterval); wheelCountdown.classList.add('hidden'); spinBtn.classList.remove('hidden', 'btn-disabled'); spinBtn.disabled = false;
+                    } else {
+                        const h = Math.floor(remaining / 3600000), m = Math.floor((remaining % 3600000) / 60000), s = Math.floor((remaining % 60000) / 1000);
+                        wheelCountdown.textContent = `Sonraki hak: ${h}s ${m}d ${s}s`;
+                    }
+                }, 1000);
+            } else {
+                if (countdownInterval) clearInterval(countdownInterval);
+                wheelCountdown.classList.add('hidden'); spinBtn.classList.remove('hidden', 'btn-disabled'); spinBtn.disabled = false;
+            }
+        }
+
+        async function spinWheel() {
+            spinBtn.disabled = true; spinBtn.classList.add('btn-disabled');
+            const prizeIndex = Math.floor(Math.random() * wheelPrizes.length); const prize = wheelPrizes[prizeIndex];
+            // 5 tam turdan sonra hedefe dön
+            const totalRotation = (360 * 5) + (360 - (prizeIndex * sliceAngle) - (sliceAngle / 2));
+            
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+            setTimeout(async () => {
+                showAlert('Tebrikler!', `${prize} TL kazandınız! Bakiye güncellendi.`);
+                const userRef = doc(db, "users", currentUser.uid);
+                await runTransaction(db, async (transaction) => {
+                    const sfDoc = await transaction.get(userRef); if (!sfDoc.exists()) throw "User does not exist!";
+                    transaction.update(userRef, { points: (sfDoc.data().points || 0) + prize, lastSpinTimestamp: Date.now() });
+                });
+                
+                // Animasyon bitince dönüşü sıfırla (görsel olarak)
+                // Son pozisyonu hedefleyen yeni dönüş açısı
+                const finalRotation = (360 - (prizeIndex * sliceAngle)) - (sliceAngle / 2);
+                wheel.style.transition = 'none'; 
+                wheel.style.transform = `rotate(${finalRotation}deg)`;
+                setTimeout(() => { wheel.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)'; }, 50);
+
+                checkSpinAvailability();
+            }, 5200); // 5 saniye + 200ms bekle
+        }
+        
+        async function showReferralModal() {
+            if (!currentUserData) return;
+            referralCodeDisplay.value = currentUserData.referralCode || 'Kod oluşturuluyor...';
+            totalReferralEarningsDisplay.textContent = `${(currentUserData.referralEarnings || 0).toFixed(2)} TL`;
+            
+            // Davet edilen kullanıcı sayısını bul
+            const q = query(collection(db, "users"), where("referrerId", "==", currentUser.uid));
+            const querySnapshot = await getDocs(q);
+            totalReferralsDisplay.textContent = querySnapshot.size;
+            
+            referralModal.classList.remove('hidden');
+        }
+
+
+        // --- EVENT LISTENERS ---
+
+        registerBtn.addEventListener('click', async () => {
+            const email = emailInput.value; 
+            const password = passwordInput.value;
+            const refCode = referralCodeInput.value.trim().toUpperCase();
+
+            if (!email || !password) { showAlert('Hata', 'Lütfen e-posta ve şifre alanlarını doldurun.'); return; }
+            loadingScreen.classList.remove('hidden');
+            
+            let referrerId = null;
+
+            try {
+                // IP Kontrolü (Simülasyon, gerçek bir IP servisi gerektirir)
+                // Bu kod Canvas ortamında çalışırken IP adresi her zaman aynı gelebilir. Gerçek bir ortamda çalıştırırken bu kontrolün işlevselliği test edilmelidir.
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                if (!ipResponse.ok) throw new Error('IP adresi alınamadı. Lütfen tekrar deneyin.');
+                const ipData = await ipResponse.json();
+                const userIp = ipData.ip;
+                
+                const ipQuery = query(collection(db, "users"), where("registrationIp", "==", userIp));
+                const ipSnapshot = await getDocs(ipQuery);
+                if (!ipSnapshot.empty) {
+                    throw new Error('Bu IP adresi ile daha önce bir hesap oluşturulmuş. Her IP adresi ile sadece bir hesap oluşturulabilir.');
                 }
-                showAlert('Kayıt Hatası', errorMessage);
+
+                // Referans Kodu Kontrolü
+                if (refCode) {
+                    const refQuery = query(collection(db, "users"), where("referralCode", "==", refCode));
+                    const refSnapshot = await getDocs(refQuery);
+                    if (refSnapshot.empty) {
+                        throw new Error('Geçersiz referans kodu. Lütfen kontrol edip tekrar deneyin.');
+                    }
+                    refSnapshot.forEach(doc => { referrerId = doc.id; });
+                }
+
+                // Kullanıcı oluşturma
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                
+                // Firestore'a kaydetme
+                const batch = writeBatch(db);
+                const newUserRef = doc(db, "users", userCredential.user.uid);
+                const newUserPayload = {
+                    email: email,
+                    points: 0,
+                    lastSpinTimestamp: 0,
+                    registrationIp: userIp,
+                    referralCode: generateReferralCode(),
+                    referralEarnings: 0
+                };
+                if (referrerId) {
+                    newUserPayload.referrerId = referrerId;
+                }
+                batch.set(newUserRef, newUserPayload);
+
+                await batch.commit();
+
+            } catch (error) {
+                let msg = error.message;
+                if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta adresi zaten kullanılıyor.';
+                else if (error.code === 'auth/weak-password') msg = 'Şifre en az 6 karakterli olmalıdır.';
+                else if (error.code === 'auth/invalid-email') msg = 'Geçersiz bir e-posta adresi girdiniz.';
+                showAlert('Kayıt Hatası', msg);
             } finally {
                 loadingScreen.classList.add('hidden');
             }
         });
 
         loginBtn.addEventListener('click', async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-             if (!email || !password) {
-                showAlert('Hata', 'Lütfen e-posta ve şifre alanlarını doldurun.');
-                return;
-            }
+            const email = emailInput.value; const password = passwordInput.value;
+            if (!email || !password) { showAlert('Hata', 'Lütfen e-posta ve şifre alanlarını doldurun.'); return; }
             loadingScreen.classList.remove('hidden');
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                showAlert('Giriş Hatası', 'E-posta veya şifre hatalı.');
-            } finally {
-                loadingScreen.classList.add('hidden');
-            }
+            try { await signInWithEmailAndPassword(auth, email, password); } 
+            catch (error) { showAlert('Giriş Hatası', 'E-posta veya şifre hatalı.'); } 
+            finally { loadingScreen.classList.add('hidden'); }
         });
 
-        logoutBtn.addEventListener('click', async () => {
-            await signOut(auth);
+        logoutBtn.addEventListener('click', () => signOut(auth));
+        
+        // GÖREVLER
+        tasksList.addEventListener('click', (e) => { 
+            if (e.target.classList.contains('do-task-btn')) showUploadPrompt(e.target.dataset.id); 
         });
+        featuredTasksList.addEventListener('click', (e) => { 
+            if (e.target.classList.contains('do-task-btn')) showUploadPrompt(e.target.dataset.id); 
+            else if (e.target.classList.contains('feature-task-btn')) showFeatureTaskModal(e.target.dataset.id); 
+        });
+        
+        createTaskBtn.addEventListener('click', showCreateTaskModal);
+        
+        // PARA ÇEKME BUTONU KALDIRILDI
 
-        tasksList.addEventListener('click', (e) => {
-            if (e.target.classList.contains('do-task-btn')) {
-                const taskId = e.target.dataset.id;
-                showUploadPrompt(taskId);
-            }
+        // SLIDER MENÜ
+        menuToggleBtn.addEventListener('click', openSlider);
+        sliderMenuOverlay.addEventListener('click', closeSlider);
+        sliderCloseBtn.addEventListener('click', closeSlider);
+        whatsappSupportLink.addEventListener('click', (e) => { e.preventDefault(); window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank'); closeSlider(); });
+        
+        // ŞANSLI ÇARK
+        luckyWheelLink.addEventListener('click', (e) => { e.preventDefault(); checkSpinAvailability(); wheelModal.classList.remove('hidden'); closeSlider(); });
+        wheelModalCloseBtn.addEventListener('click', () => wheelModal.classList.add('hidden'));
+        spinBtn.addEventListener('click', spinWheel);
+        
+        // REFERANS SİSTEMİ
+        referralLink.addEventListener('click', (e) => { e.preventDefault(); showReferralModal(); closeSlider(); });
+        referralModalCloseBtn.addEventListener('click', () => referralModal.classList.add('hidden'));
+        copyReferralBtn.addEventListener('click', () => {
+            referralCodeDisplay.select();
+            document.execCommand('copy');
+            copyReferralBtn.textContent = 'Kopyalandı!';
+            setTimeout(() => { copyReferralBtn.textContent = 'Kopyala'; }, 2000);
         });
         
-        createTaskBtn.addEventListener('click', () => {
-             showModal(
-                'Önemli Uyarı!',
-                `Lütfen mevcut bakiyenizin ekran görüntüsünü (SS) alın. Onayladıktan sonra bakiyenizden ${CREATE_TASK_COST} TL düşülecek ve WhatsApp'a yönlendirileceksiniz. SS göndermemeniz durumunda hakkınız kaybolabilir.`,
-                [
-                    { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
-                    { 
-                        text: "Anladım, WhatsApp'a Git", 
-                        class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md',
-                        onClick: async () => {
-                            try {
-                                const userRef = doc(db, "users", currentUser.uid);
-                                await runTransaction(db, async (transaction) => {
-                                    const userDoc = await transaction.get(userRef);
-                                    if (!userDoc.exists()) {
-                                        throw new Error("Kullanıcı verisi bulunamadı.");
-                                    }
-                                    const currentPoints = userDoc.data().points || 0;
-                                    if (currentPoints < CREATE_TASK_COST) {
-                                        throw new Error("Yetersiz bakiye.");
-                                    }
-                                    const newPoints = currentPoints - CREATE_TASK_COST;
-                                    transaction.update(userRef, { points: newPoints });
-                                });
-                                window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
-                            } catch (error) {
-                                showAlert('Hata', 'İşlem başarısız: ' + error.message);
-                            }
-                        }
-                    }
-                ]
-            );
-        });
-        
-        // Admin Panel Olayları
+        // YÖNETİCİ İŞLEMLERİ
         adminAddTaskBtn.addEventListener('click', async () => {
-            const title = adminTaskTitle.value;
-            const points = parseInt(adminTaskPoints.value);
-            const link = adminTaskLink.value;
-            const limit = parseInt(adminTaskLimit.value);
-
-            if (!title || !points || !link || !limit) {
-                showAlert('Hata', 'Lütfen tüm alanları doldurun.');
-                return;
-            }
-
+            const title = adminTaskTitle.value, points = parseFloat(adminTaskPoints.value), link = adminTaskLink.value, limit = parseInt(adminTaskLimit.value);
+            if (!title || !points || !link || !limit || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
             try {
-                await addDoc(collection(db, "tasks"), {
-                    title, points, link, limit,
-                    completedCount: 0,
-                    completedBy: []
-                });
+                await addDoc(collection(db, "tasks"), { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: ADMIN_UID, isFeatured: false, featureExpiresAt: null });
                 showAlert('Başarılı', 'Yeni görev eklendi.');
-                adminTaskTitle.value = '';
-                adminTaskPoints.value = '';
-                adminTaskLink.value = '';
-                adminTaskLimit.value = '';
-            } catch (error) {
-                showAlert('Hata', 'Görev eklenirken bir sorun oluştu: ' + error.message);
-            }
+                adminTaskTitle.value = ''; adminTaskPoints.value = ''; adminTaskLink.value = ''; adminTaskLimit.value = '';
+            } catch (error) { showAlert('Hata', 'Görev eklenirken bir sorun oluştu: ' + error.message); }
         });
         
         adminTasksList.addEventListener('click', async (e) => {
             if (e.target.classList.contains('admin-delete-task-btn')) {
                 const taskId = e.target.dataset.id;
-                 showModal(
-                    'Görevi Sil', 'Bu görevi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
-                    [
-                        { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
-                        { 
-                            text: 'Evet, Sil', 
-                            class: 'btn btn-secondary text-white font-bold py-2 px-4 rounded-md',
-                            onClick: async () => {
-                                await deleteDoc(doc(db, "tasks", taskId));
-                                showAlert('Başarılı', 'Görev silindi.');
-                            }
-                        }
-                    ]
-                );
+                showModal('Görevi Sil', 'Bu görevi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.', [
+                    { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
+                    { text: 'Evet, Sil', class: 'btn btn-secondary text-white font-bold py-2 px-4 rounded-md', onClick: async () => { await deleteDoc(doc(db, "tasks", taskId)); showAlert('Başarılı', 'Görev silindi.'); }}
+                ]);
             }
         });
+
+        // Yönetici Çekim Talebi İşleme Butonları KALDIRILDI
+
     </script>
 </body>
 </html>
-
-
-
