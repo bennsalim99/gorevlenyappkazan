@@ -681,6 +681,7 @@
                 }
 
                 await runTransaction(db, async (transaction) => {
+                    // HATA DÜZELTMESİ: UID ile 'users' koleksiyonunda belge referansı oluşturuldu.
                     const userRef = doc(db, "users", uid);
                     const userDoc = await transaction.get(userRef);
                     
@@ -709,6 +710,7 @@
         // Ban durumu değiştirme
         async function toggleBan(uid, currentStatus) {
             try {
+                // HATA DÜZELTMESİ: UID ile 'users' koleksiyonunda belge referansı oluşturuldu.
                 await updateDoc(doc(db, "users", uid), { isBanned: !currentStatus });
                 showAlert('Başarılı', `Kullanıcı ${!currentStatus ? 'yasaklandı' : 'yasağı kaldırıldı'}.`);
             } catch (error) {
@@ -977,7 +979,7 @@
             wheelPrizes.forEach((prize, index) => {
                 const slice = document.createElement('div');
                 slice.className = 'slice';
-                slice.innerHTML = `<span>${prize} TL</span>`;
+                slice.innerHTML = `<span>${prize} TL}</span>`;
                 slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-45deg)`; 
                 wheel.appendChild(slice);
             });
