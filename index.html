@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Görev Yap - TL Kazan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Koyu gri arka plan */
+            color: #f3f4f6;
+        }
+        .task-card {
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn {
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            background-color: #be123c;
+        }
+        .btn-secondary:hover {
+            background-color: #9f1239;
+        }
+        .btn-disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
+        }
+        /* Gizli ve görünür durumlar için yardımcı sınıflar */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Ana Konteyner -->
+    <div id="app-container" class="container mx-auto p-4 md:p-6 max-w-4xl">
+
+        <!-- Yükleniyor Ekranı -->
+        <div id="loading-screen" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="text-white text-2xl">Yükleniyor...</div>
+        </div>
+
+        <!-- Giriş ve Kayıt Ekranı -->
+        <div id="auth-screen">
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg max-w-md mx-auto mt-16">
+                <h1 class="text-3xl font-bold text-center mb-6 text-indigo-400">Hoş Geldiniz</h1>
+                <div class="space-y-4">
+                    <input type="email" id="email-input" placeholder="E-posta Adresiniz" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="password" id="password-input" placeholder="Şifreniz" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <button id="login-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md">Giriş Yap</button>
+                        <button id="register-btn" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-md">Kayıt Ol</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ana Uygulama Ekranı (Giriş yapıldıktan sonra) -->
+        <div id="main-app-screen" class="hidden">
+            <!-- Üst Bilgi Paneli -->
+            <header class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-gray-800 rounded-xl shadow-md">
+                <div class="text-lg">
+                    <span class="font-semibold">Kullanıcı:</span> <span id="user-email-display" class="font-mono"></span>
+                </div>
+                <div class="text-2xl font-bold my-4 md:my-0">
+                    Bakiye: <span id="user-points-display" class="text-green-400">0</span> TL
+                </div>
+                <div>
+                    <button id="create-task-btn" class="hidden btn btn-primary text-white font-bold py-2 px-4 rounded-md">Görev Oluştur (10 TL)</button>
+                    <button id="logout-btn" class="btn btn-secondary text-white font-bold py-2 px-4 rounded-md ml-4">Çıkış Yap</button>
+                </div>
+            </header>
+
+            <!-- Görevler Listesi -->
+            <main id="tasks-container">
+                <h2 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">Aktif Görevler</h2>
+                <div id="tasks-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Görev kartları buraya dinamik olarak eklenecek -->
+                </div>
+            </main>
+
+            <!-- Yönetici Paneli -->
+            <div id="admin-panel" class="hidden mt-16 bg-gray-800 p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold mb-6 border-b-2 border-gray-700 pb-2">Yönetici Paneli</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Yeni Görev Ekleme Formu -->
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4">Yeni Görev Ekle</h3>
+                        <div class="space-y-4">
+                            <input type="text" id="admin-task-title" placeholder="Görev Başlığı (örn: Instagram Takip)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="number" id="admin-task-points" placeholder="Kazanılacak Tutar (TL) (örn: 50)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="text" id="admin-task-link" placeholder="Görev Linki (örn: https://...)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="number" id="admin-task-limit" placeholder="Görev Limiti (örn: 10)" class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <button id="admin-add-task-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md">Görevi Ekle</button>
+                        </div>
+                    </div>
+                    <!-- Mevcut Görevler Listesi -->
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4">Mevcut Görevleri Yönet</h3>
+                        <div id="admin-tasks-list" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                            <!-- Yönetici görev listesi buraya dinamik olarak eklenecek -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Penceresi -->
+    <div id="modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full">
+            <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
+            <div id="modal-custom-content"></div>
+            <p id="modal-message" class="text-gray-300 mb-6"></p>
+            <div id="modal-buttons" class="flex justify-end gap-4">
+                <!-- Modal butonları buraya eklenecek -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // ÖNEMLİ: Bu uygulamayı kullanmak için bir Firebase projesi oluşturmanız gerekmektedir.
+        // 1. https://console.firebase.google.com/ adresine gidin ve yeni bir proje oluşturun.
+        // 2. Proje ayarlarından "Web" uygulaması ekleyin.
+        // 3. Firebase'in size verdiği `firebaseConfig` objesini aşağıdaki alana yapıştırın.
+        // 4. Firebase Authentication'ı aktif edin (E-posta/Şifre metodu).
+        // 5. Firestore Database oluşturun (Test modunda başlayabilirsiniz).
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaFqUggZuxgcs4RhzcV_fqzcyLBTJVXCs",
+            authDomain: "gorevkzn.firebaseapp.com",
+            projectId: "gorevkzn",
+            storageBucket: "gorevkzn.firebasestorage.app",
+            messagingSenderId: "465588867723",
+            appId: "1:465588867723:web:63e49dd17261c29e6eba8e",
+            measurementId: "G-2NPXKEM05Q"
+        };
+        
+        // Bu UID'ye sahip kullanıcı yönetici olacaktır. Kayıt olduktan sonra kendi UserID'nizi buraya yapıştırın.
+        const ADMIN_UID = "bWzWd68FzLYcI9OMuYPdpvzbVIU2";
+        const WHATSAPP_NUMBER = "+639649516465";
+        const CREATE_TASK_COST = 10; // Görev oluşturma bedeli 10 TL
+
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc,
+            collection,
+            addDoc,
+            onSnapshot,
+            query,
+            where,
+            deleteDoc,
+            runTransaction
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase başlatma
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elementleri
+        const loadingScreen = document.getElementById('loading-screen');
+        const authScreen = document.getElementById('auth-screen');
+        const mainAppScreen = document.getElementById('main-app-screen');
+        const adminPanel = document.getElementById('admin-panel');
+        
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        const userEmailDisplay = document.getElementById('user-email-display');
+        const userPointsDisplay = document.getElementById('user-points-display');
+        const tasksList = document.getElementById('tasks-list');
+        const createTaskBtn = document.getElementById('create-task-btn');
+
+        // Admin Panel Elementleri
+        const adminTaskTitle = document.getElementById('admin-task-title');
+        const adminTaskPoints = document.getElementById('admin-task-points');
+        const adminTaskLink = document.getElementById('admin-task-link');
+        const adminTaskLimit = document.getElementById('admin-task-limit');
+        const adminAddTaskBtn = document.getElementById('admin-add-task-btn');
+        const adminTasksList = document.getElementById('admin-tasks-list');
+
+        // Modal Elementleri
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalButtons = document.getElementById('modal-buttons');
+        const modalCustomContent = document.getElementById('modal-custom-content');
+
+        let currentUser = null;
+        let unsubscribeTasks = null;
+        let unsubscribeAdminTasks = null;
+        let unsubscribeUser = null;
+
+        // Modal fonksiyonları
+        function showModal(title, message, buttons, customHTML = '') {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalCustomContent.innerHTML = customHTML;
+            modalButtons.innerHTML = '';
+            buttons.forEach(btnInfo => {
+                const button = document.createElement('button');
+                button.textContent = btnInfo.text;
+                button.className = btnInfo.class;
+                if(btnInfo.id) button.id = btnInfo.id;
+                button.onclick = () => {
+                    if(!btnInfo.keepOpen) hideModal();
+                    if (btnInfo.onClick) btnInfo.onClick();
+                };
+                modalButtons.appendChild(button);
+            });
+            modal.classList.remove('hidden');
+        }
+
+        function hideModal() {
+            modal.classList.add('hidden');
+        }
+        
+        function showAlert(title, message) {
+            showModal(title, message, [{ text: 'Tamam', class: 'btn btn-primary px-4 py-2 rounded-md' }]);
+        }
+
+        // Kullanıcı durumunu dinle
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                currentUser = user;
+                authScreen.classList.add('hidden');
+                mainAppScreen.classList.remove('hidden');
+                userEmailDisplay.textContent = user.email;
+
+                if (user.uid === ADMIN_UID) {
+                    adminPanel.classList.remove('hidden');
+                    listenToAdminTasks();
+                } else {
+                    adminPanel.classList.add('hidden');
+                }
+
+                listenToUserData(user.uid);
+                listenToTasks(user.uid);
+
+            } else {
+                currentUser = null;
+                authScreen.classList.remove('hidden');
+                mainAppScreen.classList.add('hidden');
+                adminPanel.classList.add('hidden');
+                if (unsubscribeTasks) unsubscribeTasks();
+                if (unsubscribeAdminTasks) unsubscribeAdminTasks();
+                if (unsubscribeUser) unsubscribeUser();
+            }
+            loadingScreen.classList.add('hidden');
+        });
+
+        function listenToUserData(uid) {
+            if (unsubscribeUser) unsubscribeUser();
+            const userDocRef = doc(db, "users", uid);
+            unsubscribeUser = onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    userPointsDisplay.textContent = userData.points || 0;
+                    if (userData.points >= CREATE_TASK_COST) {
+                        createTaskBtn.classList.remove('hidden');
+                    } else {
+                        createTaskBtn.classList.add('hidden');
+                    }
+                } else {
+                    setDoc(doc(db, "users", uid), { email: currentUser.email, points: 0 });
+                }
+            });
+        }
+        
+        function listenToTasks(uid) {
+            if (unsubscribeTasks) unsubscribeTasks();
+            const q = query(collection(db, "tasks"));
+            unsubscribeTasks = onSnapshot(q, (querySnapshot) => {
+                tasksList.innerHTML = '';
+                if (querySnapshot.empty) {
+                    tasksList.innerHTML = '<p class="col-span-full text-center text-gray-400">Şu an aktif görev bulunmuyor.</p>';
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    const task = { id: doc.id, ...doc.data() };
+                    if (task.completedCount >= task.limit) return;
+                    
+                    const userHasCompleted = task.completedBy && task.completedBy.includes(uid);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'task-card p-6 rounded-lg shadow-md flex flex-col justify-between';
+                    card.innerHTML = `
+                        <div>
+                            <h3 class="text-xl font-bold text-indigo-300">${task.title}</h3>
+                            <p class="text-green-400 font-semibold my-2">${task.points} TL</p>
+                            <p class="text-sm text-gray-400 mb-4">Link: <a href="${task.link}" target="_blank" class="text-blue-400 hover:underline">Görevi Aç</a></p>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="w-full bg-gray-600 rounded-full h-2.5 mb-2">
+                                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: ${ (task.completedCount / task.limit) * 100}%"></div>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-4">Kalan: ${task.limit - task.completedCount}/${task.limit}</p>
+                            <button data-id="${task.id}" class="w-full do-task-btn btn ${userHasCompleted ? 'btn-disabled' : 'btn-primary'} text-white font-bold py-2 px-4 rounded-md" ${userHasCompleted ? 'disabled' : ''}>
+                                ${userHasCompleted ? 'Tamamlandı' : 'Görevi Yap'}
+                            </button>
+                        </div>
+                    `;
+                    tasksList.appendChild(card);
+                });
+            });
+        }
+        
+        function listenToAdminTasks() {
+             if (unsubscribeAdminTasks) unsubscribeAdminTasks();
+            const q = query(collection(db, "tasks"));
+            unsubscribeAdminTasks = onSnapshot(q, (querySnapshot) => {
+                adminTasksList.innerHTML = '';
+                 if (querySnapshot.empty) {
+                    adminTasksList.innerHTML = '<p class="text-center text-gray-400">Mevcut görev yok.</p>';
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    const task = { id: doc.id, ...doc.data() };
+                    const item = document.createElement('div');
+                    item.className = 'bg-gray-700 p-3 rounded-md flex justify-between items-center';
+                    item.innerHTML = `
+                        <div>
+                            <p class="font-semibold">${task.title}</p>
+                            <p class="text-sm text-gray-400">Limit: ${task.completedCount}/${task.limit} | Tutar: ${task.points} TL</p>
+                        </div>
+                        <button data-id="${task.id}" class="admin-delete-task-btn btn btn-secondary text-white font-bold py-1 px-3 rounded-md text-sm">Sil</button>
+                    `;
+                    adminTasksList.appendChild(item);
+                });
+            });
+        }
+
+        async function completeTaskTransaction(taskId) {
+            try {
+                let earnedAmount = 0;
+                await runTransaction(db, async (transaction) => {
+                    const taskRef = doc(db, "tasks", taskId);
+                    const userRef = doc(db, "users", currentUser.uid);
+
+                    const taskDoc = await transaction.get(taskRef);
+                    const userDoc = await transaction.get(userRef);
+
+                    if (!taskDoc.exists()) throw new Error("Görev bulunamadı.");
+                    
+                    const taskData = taskDoc.data();
+                    const userData = userDoc.data();
+                    earnedAmount = taskData.points;
+
+                    const completedBy = taskData.completedBy || [];
+                    if (completedBy.includes(currentUser.uid)) {
+                        throw new Error("Bu görevi daha önce tamamladınız.");
+                    }
+                    if (taskData.completedCount >= taskData.limit) {
+                        throw new Error("Bu görevin limiti dolmuştur.");
+                    }
+                    transaction.update(taskRef, {
+                        completedCount: taskData.completedCount + 1,
+                        completedBy: [...completedBy, currentUser.uid]
+                    });
+                    transaction.update(userRef, {
+                        points: (userData.points || 0) + taskData.points
+                    });
+                });
+                showAlert('Başarılı!', `Görevi tamamladınız ve ${earnedAmount} TL kazandınız!`);
+            } catch (error) {
+                showAlert('Hata', error.message);
+            }
+        }
+        
+        function startCountdown(taskId) {
+            let seconds = 23;
+            modalTitle.textContent = 'Kanıt Kontrol Ediliyor';
+            modalMessage.textContent = '';
+            modalButtons.innerHTML = '';
+            modalCustomContent.innerHTML = `
+                <div class="text-center">
+                    <p class="text-gray-300 mb-4">Lütfen bekleyin...</p>
+                    <div id="modal-countdown-timer" class="text-5xl font-bold text-green-400">${seconds}</div>
+                    <p class="text-gray-400 mt-2">saniye</p>
+                </div>`;
+            
+            const timerElement = document.getElementById('modal-countdown-timer');
+            const interval = setInterval(() => {
+                seconds--;
+                if(timerElement) timerElement.textContent = seconds;
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    hideModal();
+                    completeTaskTransaction(taskId);
+                }
+            }, 1000);
+        }
+
+        function showUploadPrompt(taskId) {
+            const customHTML = `
+                <p class="text-gray-300 mb-4">Görevi tamamladığınıza dair kanıt (ekran görüntüsü) yükleyin.</p>
+                <input type="file" id="modal-file-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
+            `;
+            showModal(
+                'Görevi Onayla', '',
+                [
+                    { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
+                    { 
+                        text: 'Onayla & Başlat', 
+                        id: 'modal-confirm-upload', 
+                        class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md opacity-50 cursor-not-allowed',
+                        onClick: () => startCountdown(taskId),
+                        keepOpen: true
+                    }
+                ],
+                customHTML
+            );
+
+            const fileInput = document.getElementById('modal-file-input');
+            const confirmBtn = document.getElementById('modal-confirm-upload');
+            confirmBtn.disabled = true;
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    confirmBtn.disabled = true;
+                    confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        }
+
+        // Olay dinleyicileri
+        registerBtn.addEventListener('click', async () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            if (!email || !password) {
+                showAlert('Hata', 'Lütfen e-posta ve şifre alanlarını doldurun.');
+                return;
+            }
+            loadingScreen.classList.remove('hidden');
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    email: email,
+                    points: 0
+                });
+            } catch (error) {
+                console.error("Kayıt Hatası:", error);
+                let errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.";
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'Bu e-posta adresi zaten kullanılıyor.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Şifre en az 6 karakterli olmalıdır.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Geçersiz bir e-posta adresi girdiniz.';
+                }
+                showAlert('Kayıt Hatası', errorMessage);
+            } finally {
+                loadingScreen.classList.add('hidden');
+            }
+        });
+
+        loginBtn.addEventListener('click', async () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+             if (!email || !password) {
+                showAlert('Hata', 'Lütfen e-posta ve şifre alanlarını doldurun.');
+                return;
+            }
+            loadingScreen.classList.remove('hidden');
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                showAlert('Giriş Hatası', 'E-posta veya şifre hatalı.');
+            } finally {
+                loadingScreen.classList.add('hidden');
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+        });
+
+        tasksList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('do-task-btn')) {
+                const taskId = e.target.dataset.id;
+                showUploadPrompt(taskId);
+            }
+        });
+        
+        createTaskBtn.addEventListener('click', () => {
+             showModal(
+                'Önemli Uyarı!',
+                `Lütfen mevcut bakiyenizin ekran görüntüsünü (SS) alın. Onayladıktan sonra bakiyenizden ${CREATE_TASK_COST} TL düşülecek ve WhatsApp'a yönlendirileceksiniz. SS göndermemeniz durumunda hakkınız kaybolabilir.`,
+                [
+                    { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
+                    { 
+                        text: "Anladım, WhatsApp'a Git", 
+                        class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md',
+                        onClick: async () => {
+                            try {
+                                const userRef = doc(db, "users", currentUser.uid);
+                                await runTransaction(db, async (transaction) => {
+                                    const userDoc = await transaction.get(userRef);
+                                    if (!userDoc.exists()) {
+                                        throw new Error("Kullanıcı verisi bulunamadı.");
+                                    }
+                                    const currentPoints = userDoc.data().points || 0;
+                                    if (currentPoints < CREATE_TASK_COST) {
+                                        throw new Error("Yetersiz bakiye.");
+                                    }
+                                    const newPoints = currentPoints - CREATE_TASK_COST;
+                                    transaction.update(userRef, { points: newPoints });
+                                });
+                                window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
+                            } catch (error) {
+                                showAlert('Hata', 'İşlem başarısız: ' + error.message);
+                            }
+                        }
+                    }
+                ]
+            );
+        });
+        
+        // Admin Panel Olayları
+        adminAddTaskBtn.addEventListener('click', async () => {
+            const title = adminTaskTitle.value;
+            const points = parseInt(adminTaskPoints.value);
+            const link = adminTaskLink.value;
+            const limit = parseInt(adminTaskLimit.value);
+
+            if (!title || !points || !link || !limit) {
+                showAlert('Hata', 'Lütfen tüm alanları doldurun.');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "tasks"), {
+                    title, points, link, limit,
+                    completedCount: 0,
+                    completedBy: []
+                });
+                showAlert('Başarılı', 'Yeni görev eklendi.');
+                adminTaskTitle.value = '';
+                adminTaskPoints.value = '';
+                adminTaskLink.value = '';
+                adminTaskLimit.value = '';
+            } catch (error) {
+                showAlert('Hata', 'Görev eklenirken bir sorun oluştu: ' + error.message);
+            }
+        });
+        
+        adminTasksList.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('admin-delete-task-btn')) {
+                const taskId = e.target.dataset.id;
+                 showModal(
+                    'Görevi Sil', 'Bu görevi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
+                    [
+                        { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' },
+                        { 
+                            text: 'Evet, Sil', 
+                            class: 'btn btn-secondary text-white font-bold py-2 px-4 rounded-md',
+                            onClick: async () => {
+                                await deleteDoc(doc(db, "tasks", taskId));
+                                showAlert('Başarılı', 'Görev silindi.');
+                            }
+                        }
+                    ]
+                );
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
