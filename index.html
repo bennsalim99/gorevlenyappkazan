@@ -515,6 +515,46 @@
     </div>
 
 
+    <!-- Yönetici Kullanıcı Yönetim Modalı -->
+    <div id="admin-user-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-xl w-full border border-gray-700 relative">
+            <button id="admin-user-modal-close-btn" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold mb-4 text-center text-red-400">Kullanıcı Yönetimi: <span id="admin-user-email"></span></h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Sol Panel: Puan Yönetimi -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="text-xl font-semibold mb-3 border-b border-gray-600 pb-2">Puan İşlemleri</h4>
+                    <p class="text-gray-400 mb-4">Mevcut Bakiye: <span id="admin-user-current-points" class="font-bold text-green-400">0.00 TL</span></p>
+                    
+                    <input type="number" id="admin-points-amount" placeholder="Puan Miktarı" class="w-full p-3 bg-gray-600 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3">
+                    
+                    <div class="flex gap-3">
+                        <button id="admin-add-points-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Puan Ekle</button>
+                        <button id="admin-subtract-points-btn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md">Puan Azalt</button>
+                    </div>
+                </div>
+                
+                <!-- Sağ Panel: Hesap İşlemleri -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="text-xl font-semibold mb-3 border-b border-gray-600 pb-2">Hesap İşlemleri</h4>
+                    <p class="text-gray-400 mb-4">
+                        Ban Durumu: <span id="admin-user-ban-status" class="font-bold text-green-400">Açık</span>
+                    </p>
+                    
+                    <button id="admin-toggle-ban-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md mb-3">Kullanıcıyı Yasakla</button>
+                    
+                    <button id="admin-reset-password-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Şifre Sıfırla E-posta Gönder</button>
+                </div>
+            </div>
+            
+            <p class="text-xs text-gray-500 mt-6 text-center">UID: <span id="admin-user-uid" class="font-mono"></span></p>
+        </div>
+    </div>
+
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -607,7 +647,7 @@
         function openAdminUserModal(user) {
             document.getElementById('admin-user-email').textContent = user.email;
             document.getElementById('admin-user-uid').textContent = user.uid;
-            document.getElementById('admin-user-current-points').textContent = `${user.points.toFixed(2)} TL`;
+            document.getElementById('admin-user-current-points').textContent = `${(user.points || 0).toFixed(2)} TL`;
             
             const banStatusElement = document.getElementById('admin-user-ban-status');
             const toggleBanBtn = document.getElementById('admin-toggle-ban-btn');
@@ -632,6 +672,10 @@
         // Puan ekleme/çıkarma işlemi
         async function updatePoints(uid, amount, type) {
             try {
+                if (isNaN(amount) || amount <= 0) {
+                     throw new Error("Lütfen geçerli bir pozitif miktar giriniz.");
+                }
+
                 await runTransaction(db, async (transaction) => {
                     const userRef = doc(db, "users", uid);
                     const userDoc = await transaction.get(userRef);
@@ -689,13 +733,6 @@
                     if (unsubscribeAdminTasks) unsubscribeAdminTasks();
                     if (unsubscribeAllUsers) unsubscribeAllUsers();
                 }
-
-                // BAN KONTROLÜ (Giriş yaptıktan hemen sonra)
-                if (currentUserData && currentUserData.isBanned) {
-                    signOut(auth);
-                    showAlert('Hesap Yasaklı', 'Bu hesap yönetici tarafından yasaklanmıştır.');
-                    return;
-                }
                 
                 setView('tasks');
             } else {
@@ -732,7 +769,9 @@
                 allUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
 
                 // Arama filtresini uygula
-                renderUserList(allUsers, adminUserList, userSearchInput, adminUserListMessage);
+                if (adminUserList && userSearchInput && adminUserListMessage) {
+                    renderUserList(allUsers, adminUserList, userSearchInput, adminUserListMessage);
+                }
             });
         }
         
@@ -743,7 +782,7 @@
             
             const filteredUsers = users.filter(user => 
                 user.email.toLowerCase().includes(searchTerm) || 
-                user.referralCode.toLowerCase().includes(searchTerm) ||
+                (user.referralCode && user.referralCode.toLowerCase().includes(searchTerm)) ||
                 user.id.toLowerCase().includes(searchTerm)
             );
 
@@ -802,29 +841,36 @@
             const adminResetPasswordBtn = document.getElementById('admin-reset-password-btn');
 
             // 1. Sekme Yönetimi
-            adminTasksTab.onclick = () => {
-                adminTasksContent.classList.remove('hidden');
-                adminUsersContent.classList.add('hidden');
-                adminTasksTab.classList.replace('text-gray-400', 'text-white');
-                adminTasksTab.classList.add('bg-indigo-600');
-                adminUsersTab.classList.replace('text-white', 'text-gray-400');
-                adminUsersTab.classList.remove('bg-indigo-600');
-            };
+            if (adminTasksTab) {
+                adminTasksTab.onclick = () => {
+                    adminTasksContent.classList.remove('hidden');
+                    adminUsersContent.classList.add('hidden');
+                    adminTasksTab.classList.replace('text-gray-400', 'text-white');
+                    adminTasksTab.classList.add('bg-indigo-600');
+                    adminUsersTab.classList.replace('text-white', 'text-gray-400');
+                    adminUsersTab.classList.remove('bg-indigo-600');
+                };
+            }
             
-            adminUsersTab.onclick = () => {
-                adminTasksContent.classList.add('hidden');
-                adminUsersContent.classList.remove('hidden');
-                adminUsersTab.classList.replace('text-gray-400', 'text-white');
-                adminUsersTab.classList.add('bg-indigo-600');
-                adminTasksTab.classList.replace('text-white', 'text-gray-400');
-                adminTasksTab.classList.remove('bg-indigo-600');
-            };
+            if (adminUsersTab) {
+                adminUsersTab.onclick = () => {
+                    adminTasksContent.classList.add('hidden');
+                    adminUsersContent.classList.remove('hidden');
+                    adminUsersTab.classList.replace('text-gray-400', 'text-white');
+                    adminUsersTab.classList.add('bg-indigo-600');
+                    adminTasksTab.classList.replace('text-white', 'text-gray-400');
+                    adminTasksTab.classList.remove('bg-indigo-600');
+                };
+            }
 
             // 2. Görev Ekleme
             if (adminAddTaskBtn) {
                 adminAddTaskBtn.onclick = async () => {
-                    const title = adminTaskTitle.value, points = parseInt(adminTaskPoints.value), link = adminTaskLink.value, limit = parseInt(adminTaskLimit.value);
-                    if (!title || !points || !link || !limit) { showAlert('Hata', 'Lütfen tüm alanları doldurun.'); return; }
+                    const title = adminTaskTitle.value, points = parseFloat(adminTaskPoints.value), link = adminTaskLink.value, limit = parseInt(adminTaskLimit.value);
+                    if (!title || !points || !link || !limit || isNaN(points) || isNaN(limit) || points <= 0 || limit <= 0) { 
+                         showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); 
+                         return; 
+                    }
                     try {
                         await addDoc(collection(db, "tasks"), { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: ADMIN_UID, isFeatured: false, featureExpiresAt: null, isManagerTask: true }); // isManagerTask: true eklendi
                         showAlert('Başarılı', 'Yeni görev eklendi.');
@@ -880,15 +926,17 @@
                     const uid = document.getElementById('admin-user-uid').textContent;
                     const amountInput = document.getElementById('admin-points-amount');
                     const amount = parseFloat(amountInput.value);
-                    if (amount > 0) { updatePoints(uid, amount, 'add'); adminUserModal.classList.add('hidden'); amountInput.value = ''; } 
-                    else { showAlert('Hata', 'Geçerli bir pozitif miktar giriniz.'); }
+                    updatePoints(uid, amount, 'add'); 
+                    adminUserModal.classList.add('hidden'); 
+                    amountInput.value = '';
                 };
                 adminSubtractPointsBtn.onclick = () => {
                     const uid = document.getElementById('admin-user-uid').textContent;
                     const amountInput = document.getElementById('admin-points-amount');
                     const amount = parseFloat(amountInput.value);
-                    if (amount > 0) { updatePoints(uid, amount, 'subtract'); adminUserModal.classList.add('hidden'); amountInput.value = ''; } 
-                    else { showAlert('Hata', 'Geçerli bir pozitif miktar giriniz.'); }
+                    updatePoints(uid, amount, 'subtract'); 
+                    adminUserModal.classList.add('hidden'); 
+                    amountInput.value = '';
                 };
             }
             
@@ -959,6 +1007,7 @@
                         if (currentView === 'tasks') adminPanel.classList.remove('hidden');
                         
                         // Yönetici girişi yapıldığına dair emin olmak için yeniden başlatma
+                        // Bu kontrol, navigasyon sırasında event listenerların kaybolmasını önler.
                         if (!document.getElementById('admin-users-tab').onclick) {
                              initializeAdminListeners();
                         }
@@ -1091,7 +1140,7 @@
         // --- GÖREV TAMAMLAMA ---
         async function completeTaskTransaction(taskId) {
             // Ban kontrolü tekrar yapıldı
-            if (currentUserData.isBanned) {
+            if (currentUserData && currentUserData.isBanned) {
                  signOut(auth);
                  showAlert('Hesap Yasaklı', 'Yasaklı hesaplar görev tamamlayamaz.');
                  return;
@@ -1166,7 +1215,7 @@
         }
 
         function showUploadPrompt(taskId) {
-            if (currentUserData.isBanned) {
+            if (currentUserData && currentUserData.isBanned) {
                  showAlert('Hesap Yasaklı', 'Yasaklı hesaplar görev tamamlayamaz.');
                  return;
             }
@@ -1278,7 +1327,7 @@
                  { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }, 
                  { text: "Görevi Oluştur", id: 'confirm-create-task-btn', class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md btn-disabled', onClick: async () => {
                  const title = document.getElementById('user-task-title').value, link = document.getElementById('user-task-link').value, points = parseFloat(document.getElementById('user-task-reward').value), limit = parseInt(document.getElementById('user-task-limit').value), totalCost = points * limit;
-                 if (!title || !link || !points || !limit || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
+                 if (!title || !link || !points || !limit || isNaN(points) || isNaN(limit) || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
                  
                  if (!isManager && currentUserBalance < totalCost) { showAlert('Hata', 'Bu görevi oluşturmak için yeterli bakiyeniz yok.'); return; }
                  
