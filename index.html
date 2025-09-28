@@ -110,6 +110,20 @@
             /* Dilim içeriğini düzeltmek için ters transformasyon */
             transform: skewY(45deg) rotate(22.5deg);
         }
+        /* Kaydırmalı Kart Stilleri */
+        .card-slider {
+            scroll-snap-type: x mandatory;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        .card-slider::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
+        .slider-card {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -127,6 +141,13 @@
                 </div>
                 <nav>
                     <ul>
+                        <!-- YENİ: NASIL ÇALIŞIR LİNKİ -->
+                        <li>
+                            <a href="#" id="how-it-works-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+                                <span class="ml-3 font-semibold">Nasıl Çalışır?</span>
+                            </a>
+                        </li>
                         <li>
                             <a href="#" id="referral-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -139,7 +160,7 @@
                                 <span class="ml-3 font-semibold">Şanslı Çark</span>
                             </a>
                         </li>
-                        <!-- YENİ: Instagram Takip Linki -->
+                        <!-- Instagram Takip Linki -->
                         <li>
                             <a href="https://www.instagram.com/gorevlenyapkazan" target="_blank" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
@@ -210,6 +231,83 @@
         </div>
     </div>
 
+    <!-- YENİ: NASIL ÇALIŞIR MODALI -->
+    <div id="how-it-works-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-xl shadow-xl p-6 max-w-xl w-full border border-gray-700 relative">
+            <button id="how-it-works-modal-close-btn" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-3xl font-bold mb-6 text-center text-indigo-400">Görev Yap Kazan Nasıl Çalışır?</h3>
+            
+            <div id="card-slider" class="card-slider flex space-x-4 pb-4">
+                
+                <!-- Kart 1: Görev Seçimi -->
+                <div class="slider-card bg-gray-700 p-6 rounded-lg shadow-lg border-t-4 border-indigo-500">
+                    <div class="flex items-center text-indigo-300 mb-4">
+                        <span class="text-4xl font-extrabold mr-3">1.</span>
+                        <h4 class="text-2xl font-semibold">Kolay Görevleri Seç</h4>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed">
+                        Ana sayfada listelenen görevler arasından size uygun olanı seçin. Bu görevler genellikle **Instagram, TikTok veya YouTube gibi platformlarda takip etme, beğenme veya yorum yapma** işlemlerini içerir.
+                    </p>
+                    <p class="mt-4 text-sm text-gray-400">
+                        Unutmayın: Her görev, ilan edilen **Puan** miktarını kazandırır.
+                    </p>
+                </div>
+                
+                <!-- Kart 2: Kanıt Yükleme ve Onay -->
+                <div class="slider-card bg-gray-700 p-6 rounded-lg shadow-lg border-t-4 border-green-500">
+                    <div class="flex items-center text-green-300 mb-4">
+                        <span class="text-4xl font-extrabold mr-3">2.</span>
+                        <h4 class="text-2xl font-semibold">Kanıtı Yükle ve Bekle</h4>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed">
+                        Görevi tamamladıktan sonra, kanıt olarak **ekran görüntüsünü** bize yüklemeniz gerekir.
+                    </p>
+                    <p class="mt-4 text-gray-300 leading-relaxed">
+                        Sistem, yüklediğiniz kanıtı kontrol ederken, hile ve bot kullanımını engellemek için **kısa bir bekleme süresi (yaklaşık 23 saniye)** başlatılır. Bu süre sonunda puanınız anında hesabınıza eklenir.
+                    </p>
+                </div>
+                
+                <!-- Kart 3: Limitler ve Otomatik Kapanma -->
+                <div class="slider-card bg-gray-700 p-6 rounded-lg shadow-lg border-t-4 border-amber-500">
+                    <div class="flex items-center text-amber-300 mb-4">
+                        <span class="text-4xl font-extrabold mr-3">3.</span>
+                        <h4 class="text-2xl font-semibold">Limitleri Takip Et</h4>
+                    </div>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2 ml-4">
+                        <li>Her görevin belirli bir **tamamlanma limiti** vardır (Örn: 10 kişi).</li>
+                        <li>Limit dolduğunda görev **otomatik olarak kapanır** ve listeden kalkar.</li>
+                        <li>Bu, görev oluşturan kişilerin bütçelerini kontrol etmelerini sağlar.</li>
+                        <li>Bakiyeniz: Uygulamadaki kazancınız TL değil, **Puan (TL)** olarak gösterilir.</li>
+                    </ul>
+                </div>
+                
+                <!-- Kart 4: Güvenlik ve Kazanç -->
+                <div class="slider-card bg-gray-700 p-6 rounded-lg shadow-lg border-t-4 border-red-500">
+                    <div class="flex items-center text-red-300 mb-4">
+                        <span class="text-4xl font-extrabold mr-3">4.</span>
+                        <h4 class="text-2xl font-semibold">Adil Kullanım Kuralları</h4>
+                    </div>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2 ml-4">
+                        <li>**Tek IP Kuralı:** Haksız kazanç ve botları önlemek için, her görev **tek bir IP adresi** (cihaz) tarafından sadece bir kez yapılabilir.</li>
+                        <li>**Referans Komisyonu:** Davet ettiğiniz her arkadaşınızın kazancından **%5 komisyon** kazanırsınız. Bu, pasif gelir elde etmenizi sağlar!</li>
+                    </ul>
+                </div>
+
+            </div>
+            
+            <div id="modal-pagination" class="mt-6 flex justify-center space-x-2">
+                <span class="dot w-3 h-3 bg-indigo-500 rounded-full transition-colors duration-300"></span>
+                <span class="dot w-3 h-3 bg-gray-600 rounded-full transition-colors duration-300"></span>
+                <span class="dot w-3 h-3 bg-gray-600 rounded-full transition-colors duration-300"></span>
+                <span class="dot w-3 h-3 bg-gray-600 rounded-full transition-colors duration-300"></span>
+            </div>
+            
+        </div>
+    </div>
+
+
     <!-- Ana Konteyner -->
     <div id="app-container" class="container mx-auto p-4 md:p-6 max-w-4xl">
 
@@ -230,6 +328,7 @@
                         <button id="login-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md">Giriş Yap</button>
                         <button id="register-btn" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-md">Kayıt Ol</button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -350,9 +449,10 @@
         const db = getFirestore(app);
 
         // DOM Elementleri...
-        const loadingScreen = document.getElementById('loading-screen'), authScreen = document.getElementById('auth-screen'), mainAppScreen = document.getElementById('main-app-screen'), adminPanel = document.getElementById('admin-panel'), emailInput = document.getElementById('email-input'), passwordInput = document.getElementById('password-input'), registerBtn = document.getElementById('register-btn'), referralCodeInput = document.getElementById('referral-code-input'), loginBtn = document.getElementById('login-btn'), logoutBtn = document.getElementById('logout-btn'), userEmailDisplay = document.getElementById('user-email-display'), userPointsDisplay = document.getElementById('user-points-display'), tasksList = document.getElementById('tasks-list'), featuredTasksList = document.getElementById('featured-tasks-list'), createTaskBtn = document.getElementById('create-task-btn'), adminTaskTitle = document.getElementById('admin-task-title'), adminTaskPoints = document.getElementById('admin-task-points'), adminTaskLink = document.getElementById('admin-task-link'), adminTaskLimit = document.getElementById('admin-task-limit'), adminAddTaskBtn = document.getElementById('admin-add-task-btn'), adminTasksList = document.getElementById('admin-tasks-list'), modal = document.getElementById('modal'), modalTitle = document.getElementById('modal-title'), modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons'), modalCustomContent = document.getElementById('modal-custom-content'), menuToggleBtn = document.getElementById('menu-toggle-btn'), sliderMenu = document.getElementById('slider-menu'), sliderMenuOverlay = document.getElementById('slider-menu-overlay'), sliderCloseBtn = document.getElementById('slider-close-btn'), whatsappSupportLink = document.getElementById('whatsapp-support-link'), luckyWheelLink = document.getElementById('lucky-wheel-link'), wheelModal = document.getElementById('wheel-modal'), wheelModalCloseBtn = document.getElementById('wheel-modal-close-btn'), wheel = document.getElementById('wheel'), spinBtn = document.getElementById('spin-btn'), wheelCountdown = document.getElementById('wheel-countdown'), referralLink = document.getElementById('referral-link'), referralModal = document.getElementById('referral-modal'), referralModalCloseBtn = document.getElementById('referral-modal-close-btn'), referralCodeDisplay = document.getElementById('referral-code-display'), copyReferralBtn = document.getElementById('copy-referral-btn'), totalReferralsDisplay = document.getElementById('total-referrals-display'), totalReferralEarningsDisplay = document.getElementById('total-referral-earnings-display'); // Para çekme elementleri KALDIRILDI
+        const loadingScreen = document.getElementById('loading-screen'), authScreen = document.getElementById('auth-screen'), mainAppScreen = document.getElementById('main-app-screen'), adminPanel = document.getElementById('admin-panel'), emailInput = document.getElementById('email-input'), passwordInput = document.getElementById('password-input'), registerBtn = document.getElementById('register-btn'), referralCodeInput = document.getElementById('referral-code-input'), loginBtn = document.getElementById('login-btn'), logoutBtn = document.getElementById('logout-btn'), userEmailDisplay = document.getElementById('user-email-display'), userPointsDisplay = document.getElementById('user-points-display'), tasksList = document.getElementById('tasks-list'), featuredTasksList = document.getElementById('featured-tasks-list'), createTaskBtn = document.getElementById('create-task-btn'), adminTaskTitle = document.getElementById('admin-task-title'), adminTaskPoints = document.getElementById('admin-task-points'), adminTaskLink = document.getElementById('admin-task-link'), adminTaskLimit = document.getElementById('admin-task-limit'), adminAddTaskBtn = document.getElementById('admin-add-task-btn'), adminTasksList = document.getElementById('admin-tasks-list'), modal = document.getElementById('modal'), modalTitle = document.getElementById('modal-title'), modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons'), modalCustomContent = document.getElementById('modal-custom-content'), menuToggleBtn = document.getElementById('menu-toggle-btn'), sliderMenu = document.getElementById('slider-menu'), sliderMenuOverlay = document.getElementById('slider-menu-overlay'), sliderCloseBtn = document.getElementById('slider-close-btn'), whatsappSupportLink = document.getElementById('whatsapp-support-link'), luckyWheelLink = document.getElementById('lucky-wheel-link'), wheelModal = document.getElementById('wheel-modal'), wheelModalCloseBtn = document.getElementById('wheel-modal-close-btn'), wheel = document.getElementById('wheel'), spinBtn = document.getElementById('spin-btn'), wheelCountdown = document.getElementById('wheel-countdown'), referralLink = document.getElementById('referral-link'), referralModal = document.getElementById('referral-modal'), referralModalCloseBtn = document.getElementById('referral-modal-close-btn'), referralCodeDisplay = document.getElementById('referral-code-display'), copyReferralBtn = document.getElementById('copy-referral-btn'), totalReferralsDisplay = document.getElementById('total-referrals-display'), totalReferralEarningsDisplay = document.getElementById('total-referral-earnings-display'), howItWorksLink = document.getElementById('how-it-works-link'), howItWorksModal = document.getElementById('how-it-works-modal'), howItWorksModalCloseBtn = document.getElementById('how-it-works-modal-close-btn'), cardSlider = document.getElementById('card-slider'), modalPagination = document.getElementById('modal-pagination');
 
-        let currentUser = null, currentUserData = null, currentUserBalance = 0, unsubscribeTasks = null, unsubscribeAdminTasks = null, unsubscribeUser = null, countdownInterval = null; // unsubscribeWithdrawals KALDIRILDI
+
+        let currentUser = null, currentUserData = null, currentUserBalance = 0, unsubscribeTasks = null, unsubscribeAdminTasks = null, unsubscribeUser = null, countdownInterval = null; 
 
         const wheelPrizes = [5, 1, 3, 2, 4, 1, 3, 2];
         const sliceAngle = 360 / wheelPrizes.length;
@@ -413,7 +513,7 @@
                 currentUser = user;
                 authScreen.classList.add('hidden');
                 mainAppScreen.classList.remove('hidden');
-                userEmailDisplay.textContent = user.email;
+                userEmailDisplay.textContent = user.email || user.displayName || "Misafir Kullanıcı"; 
                 if (user.uid === ADMIN_UID) {
                     adminPanel.classList.remove('hidden');
                     listenToAdminTasks();
@@ -436,6 +536,24 @@
             loadingScreen.classList.add('hidden');
         });
         
+        // Bu fonksiyon artık sadece email/şifre kaydıyla çağrılır.
+        async function createOrUpdateUserDoc(user) {
+            const userRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userRef);
+
+            if (!userDoc.exists()) {
+                // Yeni kullanıcıysa, Firestore kaydını oluştur.
+                const newUserPayload = {
+                    email: user.email,
+                    points: 0,
+                    lastSpinTimestamp: 0,
+                    referralCode: generateReferralCode(), 
+                    referralEarnings: 0
+                };
+                await setDoc(userRef, newUserPayload);
+            }
+        }
+
         function listenToUserData(uid) {
             if (unsubscribeUser) unsubscribeUser();
             const userDocRef = doc(db, "users", uid);
@@ -464,8 +582,6 @@
                 }
             });
         }
-
-        // YÖNETİCİ ÇEKİM TALEPLERİNİ DİNLEME FONKSİYONU KALDIRILDI
         
         function listenToAdminTasks() {
              if (unsubscribeAdminTasks) unsubscribeAdminTasks();
@@ -636,8 +752,7 @@
         }
 
         function showUploadPrompt(taskId) {
-            // Basit bir dosya yükleme simülasyonu
-            const customHTML = `<p class="text-gray-300 mb-4">Görevi tamamladığınıza dair kanıt (ekran görüntüsü) yükleyin. (Simülasyon)</p><input type="file" id="modal-file-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>`;
+            const customHTML = `<p class="text-gray-300 mb-4">Görevi tamamladığınıza dair kanıt (ekran görüntüsü) yükleyin.</p><input type="file" id="modal-file-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>`;
             showModal('Görevi Onayla', '', [ 
                 { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }, 
                 { text: 'Onayla & Başlat', id: 'modal-confirm-upload', class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md opacity-50 cursor-not-allowed', onClick: () => startCountdown(taskId), keepOpen: true } 
@@ -774,7 +889,6 @@
             limitInput.addEventListener('input', updateCost);
         }
 
-        // PARA ÇEKME FONKSİYONLARI KALDIRILDI
 
         async function checkSpinAvailability() {
             if (!currentUser) return;
@@ -848,6 +962,39 @@
             referralModal.classList.remove('hidden');
         }
 
+        // Nasıl Çalışır Modalını Açma ve Kaydırma Mantığı
+        function openHowItWorksModal() {
+            howItWorksModal.classList.remove('hidden');
+            updatePagination(0); // Başlangıçta ilk kartı göster
+        }
+
+        function closeHowItWorksModal() {
+            howItWorksModal.classList.add('hidden');
+            cardSlider.scrollLeft = 0; // Kapatırken en başa dön
+        }
+        
+        function updatePagination(index) {
+            const dots = modalPagination.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.remove('bg-gray-600');
+                    dot.classList.add('bg-indigo-500');
+                } else {
+                    dot.classList.remove('bg-indigo-500');
+                    dot.classList.add('bg-gray-600');
+                }
+            });
+        }
+        
+        // Kaydırma olayını dinle ve sayfayı güncelle
+        cardSlider.addEventListener('scroll', () => {
+            const scrollLeft = cardSlider.scrollLeft;
+            const cardWidth = cardSlider.clientWidth;
+            // Hangi kartın ortalandığını bul
+            const currentCardIndex = Math.round(scrollLeft / cardWidth);
+            updatePagination(currentCardIndex);
+        });
+
 
         // --- EVENT LISTENERS ---
 
@@ -863,7 +1010,6 @@
 
             try {
                 // IP Kontrolü (Simülasyon, gerçek bir IP servisi gerektirir)
-                // Bu kod Canvas ortamında çalışırken IP adresi her zaman aynı gelebilir. Gerçek bir ortamda çalıştırırken bu kontrolün işlevselliği test edilmelidir.
                 const ipResponse = await fetch('https://api.ipify.org?format=json');
                 if (!ipResponse.ok) throw new Error('IP adresi alınamadı. Lütfen tekrar deneyin.');
                 const ipData = await ipResponse.json();
@@ -928,6 +1074,15 @@
 
         logoutBtn.addEventListener('click', () => signOut(auth));
         
+        // YENİ EVENT: Nasıl Çalışır
+        howItWorksLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeSlider();
+            openHowItWorksModal();
+        });
+        howItWorksModalCloseBtn.addEventListener('click', closeHowItWorksModal);
+        
+        
         // GÖREVLER
         tasksList.addEventListener('click', (e) => { 
             if (e.target.classList.contains('do-task-btn')) showUploadPrompt(e.target.dataset.id); 
@@ -939,8 +1094,6 @@
         
         createTaskBtn.addEventListener('click', showCreateTaskModal);
         
-        // PARA ÇEKME BUTONU KALDIRILDI
-
         // SLIDER MENÜ
         menuToggleBtn.addEventListener('click', openSlider);
         sliderMenuOverlay.addEventListener('click', closeSlider);
@@ -983,8 +1136,6 @@
                 ]);
             }
         });
-
-        // Yönetici Çekim Talebi İşleme Butonları KALDIRILDI
 
     </script>
 </body>
