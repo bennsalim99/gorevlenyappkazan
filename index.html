@@ -443,8 +443,19 @@
                 if (docSnap.exists()) {
                     currentUserData = docSnap.data();
                     currentUserBalance = currentUserData.points || 0;
-                    userPointsDisplay.textContent = currentUserBalance.toFixed(2);
-                    createTaskBtn.classList.toggle('hidden', currentUserBalance < MINIMUM_BALANCE_TO_CREATE_TASK);
+                    
+                    // YÖNETİCİ KONTROLÜ VE SINIRSIZ BAKIYE GÖSTERİMİ
+                    if (uid === ADMIN_UID) {
+                        userPointsDisplay.textContent = '∞'; // Sınırsız Bakiye
+                        userPointsDisplay.classList.remove('text-green-400');
+                        userPointsDisplay.classList.add('text-indigo-400');
+                        createTaskBtn.classList.remove('hidden'); // Yönetici her zaman görev oluşturabilir
+                    } else {
+                        userPointsDisplay.textContent = currentUserBalance.toFixed(2);
+                        userPointsDisplay.classList.add('text-green-400');
+                        userPointsDisplay.classList.remove('text-indigo-400');
+                        createTaskBtn.classList.toggle('hidden', currentUserBalance < MINIMUM_BALANCE_TO_CREATE_TASK);
+                    }
                 } else {
                     // Kullanıcı verisi yoksa (olmamalı ama güvenli olması için)
                     currentUserData = null;
@@ -467,11 +478,14 @@
                 }
                 querySnapshot.forEach((doc) => {
                     const task = { id: doc.id, ...doc.data() };
+                    const isManagerTask = task.createdBy === ADMIN_UID; // Yöneticinin görevlerini belirtmek için
+                    const creatorInfo = isManagerTask ? '(Yönetici Tarafından)' : `(Kullanıcı: ${task.createdBy.substring(0, 4)}...)`;
+
                     const item = document.createElement('div');
                     item.className = 'bg-gray-700 p-3 rounded-md flex justify-between items-center';
                     item.innerHTML = `
                         <div>
-                            <p class="font-semibold">${task.title}</p>
+                            <p class="font-semibold">${task.title} <span class="text-xs text-indigo-300">${creatorInfo}</span></p>
                             <p class="text-sm text-gray-400">Limit: ${task.completedCount}/${task.limit} | Tutar: ${task.points} TL</p>
                         </div>
                         <button data-id="${task.id}" class="admin-delete-task-btn btn btn-secondary text-white font-bold py-1 px-3 rounded-md text-sm">Sil</button>
@@ -679,15 +693,21 @@
 
             let buttonsHTML = '';
             for (const [key, value] of Object.entries(featureOptions)) {
-                const isDisabled = currentUserBalance < value.cost;
+                
+                // YÖNETİCİ KONTROLÜ: Yönetici için maliyet 0
+                const actualCost = (currentUser && currentUser.uid === ADMIN_UID) ? 0 : value.cost;
+                const costDisplay = (currentUser && currentUser.uid === ADMIN_UID) ? 'ÜCRETSİZ' : `${actualCost.toFixed(2)} TL`;
+                const isDisabled = (currentUser && currentUser.uid !== ADMIN_UID) && (currentUserBalance < actualCost);
+                
                 const disabledClass = isDisabled ? 'btn-disabled opacity-50' : 'bg-amber-600 hover:bg-amber-700';
-                buttonsHTML += `<button ${isDisabled ? 'disabled' : ''} onclick="window.featureTaskGlobal('${taskId}', ${value.cost}, ${value.durationMs})" class="w-full btn ${disabledClass} text-white font-bold py-3 px-4 rounded-md">${key} (${value.cost.toFixed(2)} TL)</button>`;
+                
+                buttonsHTML += `<button ${isDisabled ? 'disabled' : ''} onclick="window.featureTaskGlobal('${taskId}', ${actualCost}, ${value.durationMs})" class="w-full btn ${disabledClass} text-white font-bold py-3 px-4 rounded-md">${key} (${costDisplay})</button>`;
             }
 
             const customHTML = `<div class="space-y-3">${buttonsHTML}</div>`;
             showModal(
                 'Görevi Öne Çıkar', 
-                'Görevinizi daha fazla kişiye ulaştırmak için öne çıkarabilirsiniz. Mevcut Bakiyeniz: ' + currentUserBalance.toFixed(2) + ' TL',
+                'Görevinizi daha fazla kişiye ulaştırmak için öne çıkarabilirsiniz. Mevcut Bakiyeniz: ' + (currentUser && currentUser.uid === ADMIN_UID ? 'SINIRSIZ' : currentUserBalance.toFixed(2) + ' TL'),
                 [{ text: 'Kapat', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }],
                 customHTML
             );
@@ -704,12 +724,28 @@
              showModal('Yeni Görev Oluştur', '', [ { text: 'İptal', class: 'bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md' }, { text: "Görevi Oluştur", id: 'confirm-create-task-btn', class: 'btn btn-primary text-white font-bold py-2 px-4 rounded-md btn-disabled', onClick: async () => {
                 const title = document.getElementById('user-task-title').value, link = document.getElementById('user-task-link').value, points = parseFloat(document.getElementById('user-task-reward').value), limit = parseInt(document.getElementById('user-task-limit').value), totalCost = points * limit;
                 if (!title || !link || !points || !limit || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
-                if (currentUserBalance < totalCost) { showAlert('Hata', 'Bu görevi oluşturmak için yeterli bakiyeniz yok. Görev maliyeti: ' + totalCost.toFixed(2) + ' TL'); return; }
+                
+                const isManager = currentUser && currentUser.uid === ADMIN_UID;
+                
+                // YÖNETİCİ KONTROLÜ: Yönetici için bakiye kontrolü atlanıyor
+                if (!isManager && currentUserBalance < totalCost) { 
+                    showAlert('Hata', 'Bu görevi oluşturmak için yeterli bakiyeniz yok. Görev maliyeti: ' + totalCost.toFixed(2) + ' TL'); 
+                    return; 
+                }
+                
                 try {
                     let newTaskId;
                     await runTransaction(db, async (transaction) => {
-                        const userRef = doc(db, "users", currentUser.uid); const userDoc = await transaction.get(userRef); if (!userDoc.exists() || (userDoc.data().points || 0) < totalCost) throw new Error("Yetersiz bakiye.");
-                        transaction.update(userRef, { points: userDoc.data().points - totalCost });
+                        const userRef = doc(db, "users", currentUser.uid); 
+                        const userDoc = await transaction.get(userRef); 
+                        if (!userDoc.exists()) throw new Error("Kullanıcı bulunamadı.");
+
+                        // YÖNETİCİ İÇİN BAKIYE DÜŞME İŞLEMİ ATLANIYOR
+                        if (!isManager) {
+                            if ((userDoc.data().points || 0) < totalCost) throw new Error("Yetersiz bakiye.");
+                            transaction.update(userRef, { points: userDoc.data().points - totalCost });
+                        }
+
                         const newTaskRef = doc(collection(db, "tasks"));
                         newTaskId = newTaskRef.id;
                         transaction.set(newTaskRef, { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: currentUser.uid, isFeatured: false, featureExpiresAt: null });
@@ -723,8 +759,13 @@
                 const reward = parseFloat(rewardInput.value) || 0; 
                 const limit = parseInt(limitInput.value) || 0; 
                 const totalCost = reward * limit; 
-                costDisplay.textContent = `${totalCost.toFixed(2)} TL`; 
-                confirmBtn.disabled = !(totalCost > 0 && currentUserBalance >= totalCost);
+                
+                const isManager = currentUser && currentUser.uid === ADMIN_UID;
+                const costText = isManager ? 'SINIRSIZ' : `${totalCost.toFixed(2)} TL`;
+                costDisplay.textContent = costText; 
+                
+                // Yönetici ise her zaman aktif, aksi takdirde bakiye kontrolü
+                confirmBtn.disabled = !isManager && !(totalCost > 0 && currentUserBalance >= totalCost);
                 confirmBtn.classList.toggle('btn-disabled', confirmBtn.disabled);
                 confirmBtn.classList.toggle('opacity-50', confirmBtn.disabled);
                 confirmBtn.classList.toggle('cursor-not-allowed', confirmBtn.disabled);
@@ -926,6 +967,7 @@
             const title = adminTaskTitle.value, points = parseFloat(adminTaskPoints.value), link = adminTaskLink.value, limit = parseInt(adminTaskLimit.value);
             if (!title || !points || !link || !limit || points <= 0 || limit <= 0) { showAlert('Hata', 'Lütfen tüm alanları geçerli değerlerle doldurun.'); return; }
             try {
+                // Yönetici tarafından oluşturulan görevler için createdBy: ADMIN_UID kullanılıyor
                 await addDoc(collection(db, "tasks"), { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: ADMIN_UID, isFeatured: false, featureExpiresAt: null });
                 showAlert('Başarılı', 'Yeni görev eklendi.');
                 adminTaskTitle.value = ''; adminTaskPoints.value = ''; adminTaskLink.value = ''; adminTaskLimit.value = '';
