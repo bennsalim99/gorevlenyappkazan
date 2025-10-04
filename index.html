@@ -56,60 +56,6 @@
         }
         .hidden { display: none; }
 
-        /* Şanslı Çark Stilleri */
-        .wheel-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 20px auto;
-        }
-        .pointer {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 30px solid #f59e0b; /* amber-500 */
-            z-index: 10;
-        }
-        #wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            border: 8px solid #374151; /* gray-700 */
-            transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .slice {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: 100% 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: white;
-            padding-right: 20px;
-        }
-        /* Dilim renkleri ve transformasyonları */
-        .slice:nth-child(1) { transform: rotate(0deg) skewY(-45deg); background: #ef4444; } /* red-500 */
-        .slice:nth-child(2) { transform: rotate(45deg) skewY(-45deg); background: #3b82f6; } /* blue-500 */
-        .slice:nth-child(3) { transform: rotate(90deg) skewY(-45deg); background: #22c55e; } /* green-500 */
-        .slice:nth-child(4) { transform: rotate(135deg) skewY(-45deg); background: #eab308; } /* yellow-500 */
-        .slice:nth-child(5) { transform: rotate(180deg) skewY(-45deg); background: #8b5cf6; } /* violet-500 */
-        .slice:nth-child(6) { transform: rotate(225deg) skewY(-45deg); background: #ec4899; } /* pink-500 */
-        .slice:nth-child(7) { transform: rotate(270deg) skewY(-45deg); background: #14b8a6; } /* teal-500 */
-        .slice:nth-child(8) { transform: rotate(315deg) skewY(-45deg); background: #f97316; } /* orange-500 */
-        .slice span {
-            /* Dilim içeriğini düzeltmek için ters transformasyon */
-            transform: skewY(45deg) rotate(22.5deg);
-        }
         /* Kaydırmalı Kart Stilleri */
         .card-slider {
             scroll-snap-type: x mandatory;
@@ -130,6 +76,18 @@
             cursor: pointer;
         }
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "@monaco-editor/loader": "https://aistudiocdn.com/@monaco-editor/loader@^1.5.0",
+    "monaco-editor": "https://aistudiocdn.com/monaco-editor@^0.53.0",
+    "markdown-it": "https://aistudiocdn.com/markdown-it@^14.1.0",
+    "safevalues": "https://cdn.jsdelivr.net/npm/safevalues@^1.2.0/dist/mjs/index.min.js",
+    "safevalues/": "https://aistudiocdn.com/safevalues@^1.2.0/",
+    "sortablejs": "https://aistudiocdn.com/sortablejs@^1.15.6"
+  }
+}
+</script>
 </head>
 <body class="antialiased">
 
@@ -160,6 +118,13 @@
                                 <span class="ml-3 font-semibold">Oluşturduğum Görevler</span>
                             </a>
                         </li>
+                        <!-- YENİ: İŞLEMLERİM LİNKİ -->
+                        <li>
+                            <a href="#" id="my-transactions-link" onclick="window.setView('transactions'); closeSlider(); return false;" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                                <span class="ml-3 font-semibold">İşlemlerim</span>
+                            </a>
+                        </li>
                         <!-- YENİ: NASIL ÇALIŞIR LİNKİ -->
                         <li>
                             <a href="#" id="how-it-works-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
@@ -171,12 +136,6 @@
                             <a href="#" id="referral-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                                 <span class="ml-3 font-semibold">Referans Sistemi</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" id="lucky-wheel-link" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-md transition-colors">
-                               <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0L12 2.69z"></path><path d="M12 12l5.66 5.66"></path><path d="M12 12L6.34 6.34"></path><path d="M12 12l-5.66 5.66"></path><path d="M12 12l5.66-5.66"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                                <span class="ml-3 font-semibold">Şanslı Çark</span>
                             </a>
                         </li>
                         <!-- Instagram Takip Linki -->
@@ -228,27 +187,6 @@
         </div>
     </div>
 
-
-    <!-- Şanslı Çark Modal -->
-    <div id="wheel-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-md w-full border border-gray-700 relative">
-            <button id="wheel-modal-close-btn" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h3 class="text-2xl font-bold mb-4 text-center text-amber-400">Şanslı Çark</h3>
-            <p class="text-center text-gray-400 mb-4">Günde bir kez çevirerek sürpriz ödüller kazanın!</p>
-            <div class="wheel-container">
-                <div class="pointer"></div>
-                <div id="wheel">
-                    <!-- 8 dilim -->
-                </div>
-            </div>
-            <div id="wheel-controls" class="text-center mt-6">
-                <button id="spin-btn" class="w-full btn btn-primary text-white font-bold py-3 px-4 rounded-md text-lg">ÇEVİR</button>
-                <div id="wheel-countdown" class="hidden mt-4 text-lg font-semibold text-red-400"></div>
-            </div>
-        </div>
-    </div>
 
     <!-- YENİ: NASIL ÇALIŞIR MODALI -->
     <div id="how-it-works-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
@@ -423,6 +361,29 @@
                 </div>
             </div>
 
+            <!-- İşlemlerim (Bekleyen ve Tamamlanan Görevler) -->
+            <div id="transactions-container" class="hidden">
+                <h2 class="text-3xl font-bold mb-6 border-b-2 border-indigo-700 pb-2 text-indigo-300">İşlemlerim</h2>
+                
+                <!-- Sekmeler -->
+                <div class="flex mb-4 border-b border-gray-700">
+                    <button id="pending-tasks-tab" class="px-6 py-2 text-white font-semibold rounded-t-lg bg-indigo-600">Onay Bekleyenler</button>
+                    <button id="completed-tasks-tab" class="px-6 py-2 text-gray-400 font-semibold rounded-t-lg hover:bg-gray-700">Tamamlananlar</button>
+                </div>
+
+                <!-- Sekme İçerikleri -->
+                <div id="pending-tasks-content">
+                    <div id="pending-tasks-list" class="space-y-4">
+                        <!-- Bekleyen görevler buraya eklenecek -->
+                    </div>
+                </div>
+                <div id="completed-tasks-content" class="hidden">
+                    <div id="completed-tasks-list" class="space-y-4">
+                        <!-- Tamamlanan görevler buraya eklenecek -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Ana İçerik -->
             <main id="tasks-container">
                 <!-- Öne Çıkan Görevler -->
@@ -514,52 +475,11 @@
         </div>
     </div>
 
-
-    <!-- Yönetici Kullanıcı Yönetim Modalı -->
-    <div id="admin-user-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-xl w-full border border-gray-700 relative">
-            <button id="admin-user-modal-close-btn" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h3 class="text-2xl font-bold mb-4 text-center text-red-400">Kullanıcı Yönetimi: <span id="admin-user-email"></span></h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Sol Panel: Puan Yönetimi -->
-                <div class="bg-gray-700 p-4 rounded-lg">
-                    <h4 class="text-xl font-semibold mb-3 border-b border-gray-600 pb-2">Puan İşlemleri</h4>
-                    <p class="text-gray-400 mb-4">Mevcut Bakiye: <span id="admin-user-current-points" class="font-bold text-green-400">0.00 TL</span></p>
-                    
-                    <input type="number" id="admin-points-amount" placeholder="Puan Miktarı" class="w-full p-3 bg-gray-600 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3">
-                    
-                    <div class="flex gap-3">
-                        <button id="admin-add-points-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Puan Ekle</button>
-                        <button id="admin-subtract-points-btn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md">Puan Azalt</button>
-                    </div>
-                </div>
-                
-                <!-- Sağ Panel: Hesap İşlemleri -->
-                <div class="bg-gray-700 p-4 rounded-lg">
-                    <h4 class="text-xl font-semibold mb-3 border-b border-gray-600 pb-2">Hesap İşlemleri</h4>
-                    <p class="text-gray-400 mb-4">
-                        Ban Durumu: <span id="admin-user-ban-status" class="font-bold text-green-400">Açık</span>
-                    </p>
-                    
-                    <button id="admin-toggle-ban-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md mb-3">Kullanıcıyı Yasakla</button>
-                    
-                    <button id="admin-reset-password-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Şifre Sıfırla E-posta Gönder</button>
-                </div>
-            </div>
-            
-            <p class="text-xs text-gray-500 mt-6 text-center">UID: <span id="admin-user-uid" class="font-mono"></span></p>
-        </div>
-    </div>
-
-
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, deleteDoc, runTransaction, updateDoc, where, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, deleteDoc, runTransaction, updateDoc, where, Timestamp, getDocs, writeBatch, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // NOT: Bu config varsayılan bir yapıdadır. Gerçek bir uygulama için kendi Firebase projenizle değiştirilmelidir.
         const firebaseConfig = {
@@ -576,28 +496,35 @@
         const WHATSAPP_NUMBER = "+639649516465";
         const MINIMUM_BALANCE_TO_CREATE_TASK = 1;
         const REFERRAL_COMMISSION_RATE = 0.05; // %5 komisyon
+        const DAILY_BONUS_AMOUNT = 0.50; // 50 kuruş
+        const DAILY_BONUS_DURATION_DAYS = 28;
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Enable offline persistence to mitigate network issues
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.warn('Firestore persistence could not be enabled. It is likely already active in another tab.');
+            } else if (err.code == 'unimplemented') {
+                console.warn('The current browser does not support all of the features required to enable Firestore persistence.');
+            }
+        });
         
         // --- GLOBAL STATE ---
-        let currentUser = null, currentUserData = null, currentUserBalance = 0, unsubscribeTasks = null, unsubscribeAdminTasks = null, unsubscribeUser = null, unsubscribeMyTasks = null, unsubscribeAllUsers = null, countdownInterval = null, currentView = 'tasks', allUsers = [];
-
-        // Çark Ödülleri ve Açıları (Hata Çözümü: Tanımlar buraya taşındı)
-        const wheelPrizes = [5, 1, 3, 2, 4, 1, 3, 2];
-        const sliceAngle = 360 / wheelPrizes.length;
+        let currentUser = null, currentUserData = null, currentUserBalance = 0, unsubscribeTasks = null, unsubscribeAdminTasks = null, unsubscribeUser = null, unsubscribeMyTasks = null, unsubscribeAllUsers = null, unsubscribeUserTasks = null, currentView = 'tasks', allUsers = [], bonusCheckedThisSession = false, userTasks = new Map(), allTasks = [];
 
         // DOM Elementleri...
-        const loadingScreen = document.getElementById('loading-screen'), authScreen = document.getElementById('auth-screen'), mainAppScreen = document.getElementById('main-app-screen'), adminPanel = document.getElementById('admin-panel'), emailInput = document.getElementById('email-input'), passwordInput = document.getElementById('password-input'), registerBtn = document.getElementById('register-btn'), referralCodeInput = document.getElementById('referral-code-input'), loginBtn = document.getElementById('login-btn'), logoutBtn = document.getElementById('logout-btn'), userEmailDisplay = document.getElementById('user-email-display'), userPointsDisplay = document.getElementById('user-points-display'), tasksList = document.getElementById('tasks-list'), featuredTasksList = document.getElementById('featured-tasks-list'), createTaskBtn = document.getElementById('create-task-btn'), modal = document.getElementById('modal'), modalTitle = document.getElementById('modal-title'), modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons'), modalCustomContent = document.getElementById('modal-custom-content'), menuToggleBtn = document.getElementById('menu-toggle-btn'), sliderMenu = document.getElementById('slider-menu'), sliderMenuOverlay = document.getElementById('slider-menu-overlay'), sliderCloseBtn = document.getElementById('slider-close-btn'), whatsappSupportLink = document.getElementById('whatsapp-support-link'), luckyWheelLink = document.getElementById('lucky-wheel-link'), wheelModal = document.getElementById('wheel-modal'), wheelModalCloseBtn = document.getElementById('wheel-modal-close-btn'), wheel = document.getElementById('wheel'), spinBtn = document.getElementById('spin-btn'), wheelCountdown = document.getElementById('wheel-countdown'), referralLink = document.getElementById('referral-link'), referralModal = document.getElementById('referral-modal'), referralModalCloseBtn = document.getElementById('referral-modal-close-btn'), referralCodeDisplay = document.getElementById('referral-code-display'), copyReferralBtn = document.getElementById('copy-referral-btn'), totalReferralsDisplay = document.getElementById('total-referrals-display'), totalReferralEarningsDisplay = document.getElementById('total-referral-earnings-display'), howItWorksLink = document.getElementById('how-it-works-link'), howItWorksModal = document.getElementById('how-it-works-modal'), howItWorksModalCloseBtn = document.getElementById('how-it-works-modal-close-btn'), cardSlider = document.getElementById('card-slider'), modalPagination = document.getElementById('modal-pagination'), myTasksLink = document.getElementById('my-tasks-link'), myTasksContainer = document.getElementById('my-tasks-container'), myTasksList = document.getElementById('my-tasks-list'), tasksContainer = document.getElementById('tasks-container'), adminUserModal = document.getElementById('admin-user-modal'), adminUserModalCloseBtn = document.getElementById('admin-user-modal-close-btn');
+        const loadingScreen = document.getElementById('loading-screen'), authScreen = document.getElementById('auth-screen'), mainAppScreen = document.getElementById('main-app-screen'), adminPanel = document.getElementById('admin-panel'), emailInput = document.getElementById('email-input'), passwordInput = document.getElementById('password-input'), registerBtn = document.getElementById('register-btn'), referralCodeInput = document.getElementById('referral-code-input'), loginBtn = document.getElementById('login-btn'), logoutBtn = document.getElementById('logout-btn'), userEmailDisplay = document.getElementById('user-email-display'), userPointsDisplay = document.getElementById('user-points-display'), tasksList = document.getElementById('tasks-list'), featuredTasksList = document.getElementById('featured-tasks-list'), createTaskBtn = document.getElementById('create-task-btn'), modal = document.getElementById('modal'), modalTitle = document.getElementById('modal-title'), modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons'), modalCustomContent = document.getElementById('modal-custom-content'), menuToggleBtn = document.getElementById('menu-toggle-btn'), sliderMenu = document.getElementById('slider-menu'), sliderMenuOverlay = document.getElementById('slider-menu-overlay'), sliderCloseBtn = document.getElementById('slider-close-btn'), whatsappSupportLink = document.getElementById('whatsapp-support-link'), referralLink = document.getElementById('referral-link'), referralModal = document.getElementById('referral-modal'), referralModalCloseBtn = document.getElementById('referral-modal-close-btn'), referralCodeDisplay = document.getElementById('referral-code-display'), copyReferralBtn = document.getElementById('copy-referral-btn'), totalReferralsDisplay = document.getElementById('total-referrals-display'), totalReferralEarningsDisplay = document.getElementById('total-referral-earnings-display'), howItWorksLink = document.getElementById('how-it-works-link'), howItWorksModal = document.getElementById('how-it-works-modal'), howItWorksModalCloseBtn = document.getElementById('how-it-works-modal-close-btn'), cardSlider = document.getElementById('card-slider'), modalPagination = document.getElementById('modal-pagination'), myTasksLink = document.getElementById('my-tasks-link'), myTasksContainer = document.getElementById('my-tasks-container'), myTasksList = document.getElementById('my-tasks-list'), tasksContainer = document.getElementById('tasks-container'), adminUserModal = document.getElementById('admin-user-modal'), adminUserModalCloseBtn = document.getElementById('admin-user-modal-close-btn'), myTransactionsLink = document.getElementById('my-transactions-link'), transactionsContainer = document.getElementById('transactions-container'), pendingTasksTab = document.getElementById('pending-tasks-tab'), completedTasksTab = document.getElementById('completed-tasks-tab'), pendingTasksContent = document.getElementById('pending-tasks-content'), completedTasksContent = document.getElementById('completed-tasks-content'), pendingTasksList = document.getElementById('pending-tasks-list'), completedTasksList = document.getElementById('completed-tasks-list');
 
 
         // --- UI GÖRÜNÜMÜ YÖNETİMİ ---
-        // window.setView ile dışarıdan erişilebilir kılındı (Hata çözümü)
         window.setView = function(view) {
             currentView = view;
             tasksContainer.classList.add('hidden');
             myTasksContainer.classList.add('hidden');
+            transactionsContainer.classList.add('hidden');
             adminPanel.classList.add('hidden'); 
 
             if (view === 'tasks') {
@@ -605,6 +532,8 @@
                 if (currentUser && currentUser.uid === ADMIN_UID) adminPanel.classList.remove('hidden');
             } else if (view === 'my-tasks') {
                 myTasksContainer.classList.remove('hidden');
+            } else if (view === 'transactions') {
+                transactionsContainer.classList.remove('hidden');
             }
         }
         
@@ -645,9 +574,75 @@
             return result;
         }
 
-        // --- YÖNETİCİ KULLANICI YÖNETİMİ FONKSİYONLARI ---
+        // --- GÜNLÜK BONUS MANTIĞI ---
+        async function checkAndAwardDailyBonus(uid, userData) {
+            if (!userData || !userData.registrationDate || userData.bonusStreakBroken) {
+                return;
+            }
 
-        // Yöneticinin kullanıcı detay modalını açar
+            const registrationDate = userData.registrationDate.toDate();
+            const now = new Date();
+
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const startOfRegistrationDay = new Date(registrationDate.getFullYear(), registrationDate.getMonth(), registrationDate.getDate());
+            
+            const diffTime = startOfToday - startOfRegistrationDay;
+            const dayNumber = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            if (dayNumber <= 0 || dayNumber > DAILY_BONUS_DURATION_DAYS) {
+                return;
+            }
+
+            const lastBonusClaimDay = userData.lastBonusClaimDay || 0;
+
+            if (lastBonusClaimDay === dayNumber) {
+                return; // Bonus for today already claimed.
+            }
+
+            const canClaimBonus = (lastBonusClaimDay === 0) || // First ever claim
+                                (dayNumber === lastBonusClaimDay + 1); // Consecutive day
+
+            if (canClaimBonus) {
+                try {
+                    await runTransaction(db, async (transaction) => {
+                        const userRef = doc(db, "users", uid);
+                        const freshUserDoc = await transaction.get(userRef);
+                        if (!freshUserDoc.exists()) throw new Error("Kullanıcı bulunamadı.");
+                        const freshUserData = freshUserDoc.data();
+                        
+                        if (freshUserData.bonusStreakBroken || (freshUserData.lastBonusClaimDay || 0) === dayNumber) {
+                            return;
+                        }
+
+                        const newPoints = (freshUserData.points || 0) + DAILY_BONUS_AMOUNT;
+                        
+                        transaction.update(userRef, {
+                            points: newPoints,
+                            lastBonusClaimDay: dayNumber,
+                        });
+                    });
+                    const message = lastBonusClaimDay === 0 ? 
+                        `İlk gün bonusun olan ${DAILY_BONUS_AMOUNT.toFixed(2)} TL hesabına eklendi! Seriyi devam ettir.` : 
+                        `Günlük ${DAILY_BONUS_AMOUNT.toFixed(2)} TL ödülün hesabına eklendi! Bu senin ${dayNumber}. gün bonusun. Seriyi bozma!`;
+                    showAlert('🎉 Hoş Geldin Bonusu! 🎉', message);
+                } catch (error) {
+                    console.error("Günlük bonus verilirken hata oluştu:", error);
+                }
+            } else { // Streak broken
+                try {
+                    const userRef = doc(db, "users", uid);
+                    await updateDoc(userRef, {
+                        bonusStreakBroken: true,
+                    });
+                    showAlert('😕 Hoş Geldin Bonusu Hakkı Bitti 😕', 'Giriş serini bozduğun için 28 günlük hoş geldin bonusu hakkın sona erdi.');
+                } catch (error) {
+                     console.error("Bonus serisi bozulurken hata oluştu:", error);
+                }
+            }
+        }
+
+
+        // --- YÖNETİCİ KULLANICI YÖNETİMİ FONKSİYONLARI ---
         function openAdminUserModal(user) {
             document.getElementById('admin-user-email').textContent = user.email;
             document.getElementById('admin-user-uid').textContent = user.uid;
@@ -673,7 +668,6 @@
             adminUserModal.classList.remove('hidden');
         }
 
-        // Puan ekleme/çıkarma işlemi
         async function updatePoints(uid, amount, type) {
             try {
                 if (isNaN(amount) || amount <= 0) {
@@ -681,7 +675,6 @@
                 }
 
                 await runTransaction(db, async (transaction) => {
-                    // HATA DÜZELTMESİ: UID ile 'users' koleksiyonunda belge referansı oluşturuldu.
                     const userRef = doc(db, "users", uid);
                     const userDoc = await transaction.get(userRef);
                     
@@ -707,10 +700,8 @@
             }
         }
         
-        // Ban durumu değiştirme
         async function toggleBan(uid, currentStatus) {
             try {
-                // HATA DÜZELTMESİ: UID ile 'users' koleksiyonunda belge referansı oluşturuldu.
                 await updateDoc(doc(db, "users", uid), { isBanned: !currentStatus });
                 showAlert('Başarılı', `Kullanıcı ${!currentStatus ? 'yasaklandı' : 'yasağı kaldırıldı'}.`);
             } catch (error) {
@@ -730,12 +721,12 @@
                 listenToUserData(user.uid);
                 listenToTasks(user.uid);
                 listenToMyTasks(user.uid);
+                listenToUserTasks(user.uid);
 
                 if (user.uid === ADMIN_UID) {
-                    initializeAdminListeners(); // Yönetici event'larını yükle
-                    listenToAllUsers(); // Tüm kullanıcıları dinlemeye başla
+                    initializeAdminListeners();
+                    listenToAllUsers();
                 } else {
-                    // Normal kullanıcı için gereksiz listenerları kapat
                     if (unsubscribeAdminTasks) unsubscribeAdminTasks();
                     if (unsubscribeAllUsers) unsubscribeAllUsers();
                 }
@@ -746,18 +737,18 @@
                 currentUserData = null; 
                 authScreen.classList.remove('hidden');
                 mainAppScreen.classList.add('hidden');
+                bonusCheckedThisSession = false;
                 
-                // Çıkış yapıldığında tüm dinleyicileri kapat (Stabilite)
                 if (unsubscribeTasks) unsubscribeTasks();
                 if (unsubscribeAdminTasks) unsubscribeAdminTasks();
                 if (unsubscribeUser) unsubscribeUser();
                 if (unsubscribeMyTasks) unsubscribeMyTasks();
                 if (unsubscribeAllUsers) unsubscribeAllUsers();
+                if (unsubscribeUserTasks) unsubscribeUserTasks();
             }
             loadingScreen.classList.add('hidden');
         });
 
-        // Tüm kullanıcıları çek ve ara/filtreleme listesini güncelle (Yönetici için)
         function listenToAllUsers() {
             if (unsubscribeAllUsers) unsubscribeAllUsers();
             const q = query(collection(db, "users"));
@@ -772,17 +763,14 @@
                     allUsers.push({ id: doc.id, ...doc.data() });
                 });
                 
-                // Puanlara göre sırala
                 allUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
 
-                // Arama filtresini uygula
                 if (adminUserList && userSearchInput && adminUserListMessage) {
                     renderUserList(allUsers, adminUserList, userSearchInput, adminUserListMessage);
                 }
             });
         }
         
-        // Kullanıcı listesini render eden yardımcı fonksiyon
         function renderUserList(users, listElement, searchInput, messageElement) {
             const searchTerm = searchInput.value.toLowerCase();
             listElement.innerHTML = '';
@@ -824,30 +812,24 @@
         // --- YÖNETİCİ BUTON OLAY DİNLEYİCİLERİ VE MANTIĞI ---
         
         function initializeAdminListeners() {
-            // SADECE YÖNETİCİ GİRİŞ YAPTIĞINDA VE ELEMENTLER VAR OLDUĞUNDA ÇALIŞIR (HATA ÇÖZÜMÜ)
-            
             const adminTasksTab = document.getElementById('admin-tasks-tab');
             const adminUsersTab = document.getElementById('admin-users-tab');
             const adminTasksContent = document.getElementById('admin-tasks-content');
             const adminUsersContent = document.getElementById('admin-users-content');
-            
             const adminAddTaskBtn = document.getElementById('admin-add-task-btn');
             const adminTaskTitle = document.getElementById('admin-task-title');
             const adminTaskPoints = document.getElementById('admin-task-points');
             const adminTaskLink = document.getElementById('admin-task-link');
             const adminTaskLimit = document.getElementById('admin-task-limit');
             const adminTasksList = document.getElementById('admin-tasks-list');
-            
             const userSearchInput = document.getElementById('user-search-input');
             const adminUserList = document.getElementById('admin-user-list');
             const adminUserListMessage = document.getElementById('admin-user-list-message');
-            
             const adminAddPointsBtn = document.getElementById('admin-add-points-btn');
             const adminSubtractPointsBtn = document.getElementById('admin-subtract-points-btn');
             const adminToggleBanBtn = document.getElementById('admin-toggle-ban-btn');
             const adminResetPasswordBtn = document.getElementById('admin-reset-password-btn');
 
-            // 1. Sekme Yönetimi
             if (adminTasksTab) {
                 adminTasksTab.onclick = () => {
                     adminTasksContent.classList.remove('hidden');
@@ -870,7 +852,6 @@
                 };
             }
 
-            // 2. Görev Ekleme
             if (adminAddTaskBtn) {
                 adminAddTaskBtn.onclick = async () => {
                     const title = adminTaskTitle.value, points = parseFloat(adminTaskPoints.value), link = adminTaskLink.value, limit = parseInt(adminTaskLimit.value);
@@ -879,14 +860,13 @@
                          return; 
                     }
                     try {
-                        await addDoc(collection(db, "tasks"), { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: ADMIN_UID, isFeatured: false, featureExpiresAt: null, isManagerTask: true }); // isManagerTask: true eklendi
+                        await addDoc(collection(db, "tasks"), { title, points, link, limit, completedCount: 0, completedBy: [], createdBy: ADMIN_UID, isFeatured: false, featureExpiresAt: null, isManagerTask: true });
                         showAlert('Başarılı', 'Yeni görev eklendi.');
                         adminTaskTitle.value = ''; adminTaskPoints.value = ''; adminTaskLink.value = ''; adminTaskLimit.value = '';
                     } catch (error) { showAlert('Hata', 'Görev eklenirken bir sorun oluştu: ' + error.message); }
                 };
             }
             
-            // 3. Yönetici Görev Silme Dinleyicisi
             if (adminTasksList) {
                 adminTasksList.addEventListener('click', async (e) => {
                     if (e.target.classList.contains('admin-delete-task-btn')) {
@@ -899,14 +879,12 @@
                 });
             }
             
-            // 4. Kullanıcı Arama
             if (userSearchInput) {
                 userSearchInput.oninput = () => {
                     renderUserList(allUsers, adminUserList, userSearchInput, adminUserListMessage);
                 };
             }
 
-            // 5. Kullanıcı Yönetim Modalı Açma
             if (adminUserList) {
                 adminUserList.addEventListener('click', (e) => {
                     const row = e.target.closest('.admin-user-row');
@@ -920,14 +898,12 @@
                 });
             }
 
-            // 6. Yönetim Modal Kapatma
             if (adminUserModalCloseBtn) {
                 adminUserModalCloseBtn.onclick = () => {
                     adminUserModal.classList.add('hidden');
                 };
             }
 
-            // 7. Puan İşlemleri
             if (adminAddPointsBtn && adminSubtractPointsBtn) {
                 adminAddPointsBtn.onclick = () => {
                     const uid = document.getElementById('admin-user-uid').textContent;
@@ -947,7 +923,6 @@
                 };
             }
             
-            // 8. Ban İşlemleri
             if (adminToggleBanBtn) {
                 adminToggleBanBtn.onclick = () => {
                     const uid = document.getElementById('admin-user-uid').textContent;
@@ -956,7 +931,6 @@
                 };
             }
             
-            // 9. Şifre Sıfırlama
             if (adminResetPasswordBtn) {
                 adminResetPasswordBtn.onclick = async () => {
                     const email = document.getElementById('admin-user-email').textContent;
@@ -965,26 +939,11 @@
                         showAlert('Başarılı', `${email} adresine şifre sıfırlama e-postası gönderildi.`);
                         adminUserModal.classList.add('hidden');
                     } catch (error) {
-                         // Firebase'in şifre sıfırlama e-postasını göndermek için kullanıcı oturumunun açık olmaması gerekebilir.
                         showAlert('Hata', 'Şifre sıfırlama e-postası gönderilemedi. Hata: ' + error.message);
                     }
                 };
             }
-
-        } // End of initializeAdminListeners
-
-        // --- ÇARK KODU ---
-        function createWheelSlices() {
-            wheel.innerHTML = '';
-            wheelPrizes.forEach((prize, index) => {
-                const slice = document.createElement('div');
-                slice.className = 'slice';
-                slice.innerHTML = `<span>${prize} TL}</span>`;
-                slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-45deg)`; 
-                wheel.appendChild(slice);
-            });
         }
-        createWheelSlices();
 
         // --- USER DATA LISTENERS (GEREKLİ) ---
         function listenToUserData(uid) {
@@ -993,16 +952,20 @@
             unsubscribeUser = onSnapshot(userDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     currentUserData = docSnap.data();
+                    
+                    if (!bonusCheckedThisSession) {
+                        checkAndAwardDailyBonus(uid, currentUserData);
+                        bonusCheckedThisSession = true;
+                    }
+
                     currentUserBalance = currentUserData.points || 0;
                     
-                    // BAN KONTROLÜ
                     if (currentUserData.isBanned && currentUser && currentUser.uid === uid) {
                         signOut(auth);
                         showAlert('Hesap Yasaklı', 'Bu hesap yönetici tarafından yasaklanmıştır.');
                         return;
                     }
 
-                    // YÖNETİCİ KONTROLÜ VE SINIRSIZ BAKIYE GÖSTERİMİ
                     if (uid === ADMIN_UID) {
                         userPointsDisplay.textContent = '∞'; 
                         userPointsDisplay.classList.remove('text-green-400');
@@ -1011,8 +974,6 @@
                         
                         if (currentView === 'tasks') adminPanel.classList.remove('hidden');
                         
-                        // Yönetici girişi yapıldığına dair emin olmak için yeniden başlatma
-                        // Bu kontrol, navigasyon sırasında event listenerların kaybolmasını önler.
                         if (document.getElementById('admin-users-tab') && !document.getElementById('admin-users-tab').onclick) {
                              initializeAdminListeners();
                         }
@@ -1031,7 +992,7 @@
             });
         }
 
-        // --- TASK LISTENERS ---
+        // --- TASK LISTENERS & RENDERING ---
         function listenToMyTasks(uid) {
             if (unsubscribeMyTasks) unsubscribeMyTasks();
             const q = query(collection(db, "tasks"), where("createdBy", "==", uid));
@@ -1073,42 +1034,55 @@
             });
         }
         
-        function listenToTasks(uid) {
+        function renderAllTasks() {
+            if (!currentUser) return;
+            tasksList.innerHTML = '';
+            featuredTasksList.innerHTML = '';
+            let normalTaskCount = 0;
+            let featuredTaskCount = 0;
+
+            allTasks.forEach((task) => {
+                if (task.completedCount >= task.limit) return;
+                const card = createTaskCard(task, currentUser.uid, userTasks);
+                if (!card) return;
+
+                const isFeatureActive = task.isFeatured && task.featureExpiresAt && (task.featureExpiresAt.toMillis() > Date.now());
+                if (isFeatureActive) {
+                    card.classList.add('featured-card');
+                    featuredTasksList.appendChild(card);
+                    featuredTaskCount++;
+                } else {
+                    tasksList.appendChild(card);
+                    normalTaskCount++;
+                }
+            });
+
+            if (normalTaskCount === 0) tasksList.innerHTML = '<p class="col-span-full text-center text-gray-400">Şu an aktif görev bulunmuyor.</p>';
+            if (featuredTaskCount === 0) featuredTasksList.innerHTML = '<p class="col-span-full text-center text-gray-400">Şu an öne çıkan görev bulunmuyor.</p>';
+        }
+
+        function listenToTasks() {
             if (unsubscribeTasks) unsubscribeTasks();
             const q = query(collection(db, "tasks"));
             unsubscribeTasks = onSnapshot(q, (querySnapshot) => {
-                tasksList.innerHTML = '';
-                featuredTasksList.innerHTML = '';
-                
-                let normalTaskCount = 0;
-                let featuredTaskCount = 0;
-
+                const newTasks = [];
                 querySnapshot.forEach((doc) => {
-                    const task = { id: doc.id, ...doc.data() };
-                    if (task.completedCount >= task.limit) return;
-                    
-                    const card = createTaskCard(task, uid);
-                    const isFeatureActive = task.isFeatured && task.featureExpiresAt && (task.featureExpiresAt.toMillis() > Date.now());
-
-                    if (isFeatureActive) {
-                        card.classList.add('featured-card');
-                        featuredTasksList.appendChild(card);
-                        featuredTaskCount++;
-                    } else {
-                        tasksList.appendChild(card);
-                        normalTaskCount++;
-                    }
+                    newTasks.push({ id: doc.id, ...doc.data() });
                 });
-
-                if (normalTaskCount === 0) tasksList.innerHTML = '<p class="col-span-full text-center text-gray-400">Şu an aktif görev bulunmuyor.</p>';
-                if (featuredTaskCount === 0) featuredTasksList.innerHTML = '<p class="col-span-full text-center text-gray-400">Şu an öne çıkan görev bulunmuyor.</p>';
+                allTasks = newTasks;
+                renderAllTasks();
             });
         }
         
-        function createTaskCard(task, uid) {
-            const userHasCompleted = task.completedBy && task.completedBy.includes(uid);
-            const isOwnTask = task.createdBy === uid;
+        function createTaskCard(task, uid, userTasksMap) {
+            const userTask = userTasksMap.get(task.id);
+            const userTaskStatus = userTask ? userTask.status : null;
+
+            if (userTaskStatus === 'pending' || userTaskStatus === 'approved') {
+                return null;
+            }
             
+            const isOwnTask = task.createdBy === uid;
             const card = document.createElement('div');
             card.className = 'task-card p-6 rounded-lg shadow-md flex flex-col justify-between';
             
@@ -1116,19 +1090,17 @@
             if (isOwnTask) {
                 const featureBtnText = (task.isFeatured && task.featureExpiresAt && task.featureExpiresAt.toMillis() > Date.now()) ? 'Öne Çıkarıldı' : 'Öne Çıkar';
                 const featureBtnClass = (task.isFeatured && task.featureExpiresAt && task.featureExpiresAt.toMillis() > Date.now()) ? 'bg-amber-700 hover:bg-amber-800' : 'bg-amber-500 hover:bg-amber-600';
-                buttonHTML = `
-                    <button class="w-full btn ${featureBtnClass} text-white font-bold py-2 px-4 rounded-md feature-task-btn mt-2" data-id="${task.id}" ${featureBtnText === 'Öne Çıkarıldı' ? 'disabled' : ''}>${featureBtnText}</button>
-                `;
-            } else if (userHasCompleted) {
-                buttonHTML = `<button class="w-full btn btn-disabled text-white font-bold py-2 px-4 rounded-md" disabled>Tamamlandı</button>`;
+                buttonHTML = `<button class="w-full btn ${featureBtnClass} text-white font-bold py-2 px-4 rounded-md feature-task-btn mt-2" data-id="${task.id}" ${featureBtnText === 'Öne Çıkarıldı' ? 'disabled' : ''}>${featureBtnText}</button>`;
+            } else if (userTaskStatus === 'started') {
+                 buttonHTML = `<button data-id="${task.id}" data-link="${task.link}" class="w-full upload-proof-btn btn bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md">Kanıt Yükle</button>`;
             } else {
-                buttonHTML = `<button data-id="${task.id}" class="w-full do-task-btn btn btn-primary text-white font-bold py-2 px-4 rounded-md">Görevi Yap</button>`;
+                buttonHTML = `<button data-id="${task.id}" data-link="${task.link}" data-title="${task.title}" data-points="${task.points}" class="w-full do-task-btn btn btn-primary text-white font-bold py-2 px-4 rounded-md">Görevi Yap</button>`;
             }
             
             card.innerHTML = `
                 <div>
                     <h3 class="text-xl font-bold text-indigo-300">${task.title}</h3>
-                    <p class="text-green-400 font-semibold my-2">${task.points.toFixed(2)} TL}</p>
+                    <p class="text-green-400 font-semibold my-2">${task.points.toFixed(2)} TL</p>
                     <p class="text-sm text-gray-400 mb-4">Link: <a href="${task.link}" target="_blank" class="text-blue-400 hover:underline">Görevi Aç</a></p>
                 </div>
                 <div class="mt-auto">
@@ -1141,80 +1113,103 @@
             `;
             return card;
         }
-        
-        // --- GÖREV TAMAMLAMA ---
-        async function completeTaskTransaction(taskId) {
-            // Ban kontrolü tekrar yapıldı
-            if (currentUserData && currentUserData.isBanned) {
-                 signOut(auth);
-                 showAlert('Hesap Yasaklı', 'Yasaklı hesaplar görev tamamlayamaz.');
-                 return;
-            }
 
+        // --- GÖREV ONAY AKIŞI ---
+
+        async function approveTask(userTaskDocId, taskId) {
             try {
                 let earnedAmount = 0;
                 await runTransaction(db, async (transaction) => {
+                    // --- 1. ALL READS FIRST ---
                     const taskRef = doc(db, "tasks", taskId);
                     const userRef = doc(db, "users", currentUser.uid);
+                    const userTaskRef = doc(db, "userTasks", userTaskDocId);
 
                     const taskDoc = await transaction.get(taskRef);
                     const userDoc = await transaction.get(userRef);
+                    const userTaskDoc = await transaction.get(userTaskRef);
 
-                    if (!taskDoc.exists()) throw new Error("Görev bulunamadı.");
-                    if (!userDoc.exists()) throw new Error("Kullanıcı bulunamadı.");
-
-                    const taskData = taskDoc.data(); 
+                    if (!taskDoc.exists() || !userDoc.exists() || !userTaskDoc.exists()) throw new Error("Görev, kullanıcı veya kullanıcı görevi bulunamadı.");
+                    
+                    const taskData = taskDoc.data();
                     const userData = userDoc.data();
+                    const userTaskData = userTaskDoc.data();
                     earnedAmount = taskData.points;
                     
-                    const completedBy = taskData.completedBy || [];
-                    if (completedBy.includes(currentUser.uid)) throw new Error("Bu görevi daha önce tamamladınız.");
-                    if (taskData.completedCount >= taskData.limit) throw new Error("Bu görevin limiti dolmuştur.");
-                    if (taskData.createdBy === currentUser.uid) throw new Error("Kendi görevinizi tamamlayamazsınız.");
-                    
-                    // IP KONTROLÜ
-                    // NOT: Gerçek IP kontrolü sunucu tarafında yapılmalıdır. Bu, sadece istemci tarafında bir simülasyondur.
-                    
+                    let referrerRef = null, referrerDoc = null;
+                    if (userData.referrerId) {
+                        referrerRef = doc(db, "users", userData.referrerId);
+                        referrerDoc = await transaction.get(referrerRef);
+                    }
+
+                    // --- 2. VALIDATION & CHECKS ---
+                    if (userTaskData.status === 'approved') return;
+                    if (taskData.completedBy.includes(currentUser.uid)) return;
+                    if (taskData.completedCount >= taskData.limit) return;
+
+                    // --- 3. ALL WRITES LAST ---
                     transaction.update(userRef, { points: (userData.points || 0) + taskData.points });
+                    
                     transaction.update(taskRef, { 
                         completedCount: taskData.completedCount + 1, 
-                        completedBy: [...completedBy, currentUser.uid] 
+                        completedBy: [...taskData.completedBy, currentUser.uid] 
                     });
+                    
+                    transaction.update(userTaskRef, { status: 'approved', approvedAt: Timestamp.now() });
 
-                    // Referans komisyonunu işle
-                    if (userData.referrerId) {
+                    if (referrerDoc && referrerDoc.exists()) {
                         const commission = taskData.points * REFERRAL_COMMISSION_RATE;
-                        const referrerRef = doc(db, "users", userData.referrerId);
-                        const referrerDoc = await transaction.get(referrerRef);
-                        if (referrerDoc.exists()) {
-                             const referrerData = referrerDoc.data();
-                             transaction.update(referrerRef, {
-                                 points: (referrerData.points || 0) + commission,
-                                 referralEarnings: (referrerData.referralEarnings || 0) + commission
-                             });
-                        }
+                        const referrerData = referrerDoc.data();
+                        transaction.update(referrerRef, {
+                            points: (referrerData.points || 0) + commission,
+                            referralEarnings: (referrerData.referralEarnings || 0) + commission
+                        });
                     }
                 });
-                showAlert('Başarılı!', `Görevi tamamladınız ve ${earnedAmount.toFixed(2)} TL kazandınız!`);
+
+                showAlert('Görev Onaylandı!', `'${userTasks.get(taskId)?.taskTitle || 'Göreviniz'}' onaylandı ve ${earnedAmount.toFixed(2)} TL kazandınız!`);
             } catch (error) {
-                showAlert('Hata', error.message);
+                console.error("Onaylama hatası: ", error);
+                showAlert('Onaylama Hatası', error.message);
             }
         }
         
+        function scheduleApproval(userTaskDocId, taskId) {
+            const minMilliseconds = 1000; // 1 saniye
+            const maxMilliseconds = 60000; // 1 dakika
+            const delay = Math.random() * (maxMilliseconds - minMilliseconds) + minMilliseconds;
+            setTimeout(() => {
+                approveTask(userTaskDocId, taskId);
+            }, delay);
+        }
+
         function startCountdown(taskId) {
             let seconds = 23;
             modalTitle.textContent = 'Kanıt Kontrol Ediliyor';
             modalMessage.textContent = '';
             modalButtons.innerHTML = '';
             modalCustomContent.innerHTML = `<div class="text-center"><p class="text-gray-300 mb-4">Lütfen bekleyin...</p><div id="modal-countdown-timer" class="text-5xl font-bold text-green-400">${seconds}</div><p class="text-gray-400 mt-2">saniye</p></div>`;
+            
             const timerElement = document.getElementById('modal-countdown-timer');
-            const interval = setInterval(() => {
+            const interval = setInterval(async () => {
                 seconds--;
                 if(timerElement) timerElement.textContent = seconds;
                 if (seconds <= 0) {
                     clearInterval(interval);
                     hideModal();
-                    completeTaskTransaction(taskId);
+                    
+                    try {
+                        const userTask = userTasks.get(taskId);
+                        if (!userTask) throw new Error('Görev durumu bulunamadı.');
+                        
+                        const userTaskRef = doc(db, "userTasks", userTask.id);
+                        await updateDoc(userTaskRef, { status: 'pending', submittedAt: Timestamp.now() });
+
+                        showAlert('Onaya Gönderildi', 'Kanıtınız onaya gönderildi. Ortalama onay süresi 1-8 dakikadır.');
+                        scheduleApproval(userTask.id, taskId);
+                    } catch(error) {
+                        showAlert('Hata', 'Görev onaya gönderilirken bir sorun oluştu: ' + error.message);
+                    }
                 }
             }, 1000);
         }
@@ -1287,7 +1282,6 @@
             }
         }
 
-        // Globalde tanımlandı (Hata çözümü)
         window.featureTaskGlobal = async (taskId, cost, durationMs) => {
             hideModal();
             await featureTask(taskId, cost, durationMs);
@@ -1363,17 +1357,17 @@
                  costDisplay.textContent = `${totalCost.toFixed(2)} TL`; 
                  
                  if (isManager) {
-                     confirmBtn.classList.remove('btn-disabled');
-                     confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                     confirmBtn.classList.remove('btn-disabled', 'opacity-50', 'cursor-not-allowed');
                  } else {
-                     confirmBtn.classList.toggle('btn-disabled', !(totalCost > 0 && currentUserBalance >= totalCost)); 
-                     confirmBtn.classList.toggle('opacity-50', !(totalCost > 0 && currentUserBalance >= totalCost)); 
-                     confirmBtn.classList.toggle('cursor-not-allowed', !(totalCost > 0 && currentUserBalance >= totalCost)); 
+                     const canAfford = totalCost > 0 && currentUserBalance >= totalCost;
+                     confirmBtn.classList.toggle('btn-disabled', !canAfford);
+                     confirmBtn.classList.toggle('opacity-50', !canAfford);
+                     confirmBtn.classList.toggle('cursor-not-allowed', !canAfford);
                  }
              }
              rewardInput.addEventListener('input', updateCost); 
              limitInput.addEventListener('input', updateCost);
-             updateCost(); // İlk yüklemede çalıştır
+             updateCost();
         }
 
         // --- AUTH KISMI ---
@@ -1389,20 +1383,17 @@
             let referrerId = null;
 
             try {
-                 // IP Kontrolü (Simülasyon amaçlı, production'da sunucuda yapılmalı)
                 const ipResponse = await fetch('https://api.ipify.org?format=json');
                 if (!ipResponse.ok) throw new Error('IP adresi alınamadı. Lütfen tekrar deneyin.');
                 const ipData = await ipResponse.json();
                 const userIp = ipData.ip;
                 
-                // IP Kontrolü (Sadece aynı IP'den tek kayıt)
                 const ipQuery = query(collection(db, "users"), where("registrationIp", "==", userIp));
                 const ipSnapshot = await getDocs(ipQuery);
                 if (!ipSnapshot.empty) {
                      throw new Error('Bu IP adresi ile daha önce bir hesap oluşturulmuş. Her IP adresi ile sadece bir hesap oluşturulabilir.');
                 }
 
-                // Referans Kodu Kontrolü
                 if (refCode) {
                     const refQuery = query(collection(db, "users"), where("referralCode", "==", refCode));
                     const refSnapshot = await getDocs(refQuery);
@@ -1412,19 +1403,19 @@
                     refSnapshot.forEach(doc => { referrerId = doc.id; });
                 }
 
-                // Kullanıcı oluşturma
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 
-                // Firestore'a kaydetme
                 const batch = writeBatch(db);
                 const newUserRef = doc(db, "users", userCredential.user.uid);
                 const newUserPayload = {
                     email: email,
                     points: 0,
-                    lastSpinTimestamp: 0,
                     registrationIp: userIp,
+                    registrationDate: Timestamp.now(),
                     referralCode: generateReferralCode(),
                     referralEarnings: 0,
+                    lastBonusClaimDay: 0,
+                    bonusStreakBroken: false,
                     isBanned: false
                 };
                 if (referrerId) {
@@ -1451,7 +1442,6 @@
             loadingScreen.classList.remove('hidden');
             try { 
                 await signInWithEmailAndPassword(auth, email, password); 
-                // onAuthStateChanged ban kontrolünü yapar
             } 
             catch (error) { 
                 showAlert('Giriş Hatası', 'E-posta veya şifre hatalı.'); 
@@ -1463,12 +1453,29 @@
         
         // --- OLAY DİNLEYİCİLERİ ---
 
-        // Genel görev listesi tıklamaları (Hem Aktif hem de Öne Çıkan)
         function initializeTaskListeners(listElement) {
-             listElement.addEventListener('click', (e) => { 
+             listElement.addEventListener('click', async (e) => { 
                 const doTaskBtn = e.target.closest('.do-task-btn');
                 if (doTaskBtn) { 
-                     showUploadPrompt(doTaskBtn.dataset.id); 
+                    const taskId = doTaskBtn.dataset.id;
+                    const taskLink = doTaskBtn.dataset.link;
+                    const taskTitle = doTaskBtn.dataset.title;
+                    const taskPoints = parseFloat(doTaskBtn.dataset.points);
+
+                    window.open(taskLink, '_blank');
+                    await addDoc(collection(db, "userTasks"), {
+                        userId: currentUser.uid,
+                        taskId: taskId,
+                        taskTitle: taskTitle,
+                        taskPoints: taskPoints,
+                        status: 'started',
+                        createdAt: Timestamp.now()
+                    });
+                }
+
+                const uploadProofBtn = e.target.closest('.upload-proof-btn');
+                if (uploadProofBtn) {
+                     showUploadPrompt(uploadProofBtn.dataset.id);
                 }
                 
                 const featureTaskBtn = e.target.closest('.feature-task-btn');
@@ -1487,97 +1494,20 @@
         
         whatsappSupportLink.addEventListener('click', (e) => { e.preventDefault(); window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank'); closeSlider(); });
         
-        // Çark
-        luckyWheelLink.addEventListener('click', (e) => { e.preventDefault(); checkSpinAvailability(); wheelModal.classList.remove('hidden'); closeSlider(); });
-        wheelModalCloseBtn.addEventListener('click', () => wheelModal.classList.add('hidden'));
-        spinBtn.addEventListener('click', spinWheel);
-        
-        // Referans
         referralLink.addEventListener('click', (e) => { e.preventDefault(); showReferralModal(); closeSlider(); });
         referralModalCloseBtn.addEventListener('click', () => referralModal.classList.add('hidden'));
         copyReferralBtn.addEventListener('click', () => {
-            referralCodeDisplay.select();
-            document.execCommand('copy');
-            copyReferralBtn.textContent = 'Kopyalandı!';
-            setTimeout(() => { copyReferralBtn.textContent = 'Kopyala'; }, 2000);
+            navigator.clipboard.writeText(referralCodeDisplay.value).then(() => {
+                copyReferralBtn.textContent = 'Kopyalandı!';
+                setTimeout(() => { copyReferralBtn.textContent = 'Kopyala'; }, 2000);
+            }).catch(err => {
+                showAlert('Hata', 'Kopyalanamadı. Lütfen manuel olarak deneyin.');
+            });
         });
         
-        // Nasıl Çalışır
         howItWorksLink.addEventListener('click', (e) => { e.preventDefault(); howItWorksModal.classList.remove('hidden'); closeSlider(); });
         howItWorksModalCloseBtn.addEventListener('click', () => howItWorksModal.classList.add('hidden'));
         
-        // --- ÇARK MANTIĞI ---
-        async function checkSpinAvailability() {
-            if (!currentUser) return;
-            spinBtn.disabled = true; spinBtn.classList.add('btn-disabled');
-            
-            const userRef = doc(db, "users", currentUser.uid);
-            const userDoc = await getDoc(userRef); 
-            const userData = userDoc.data();
-            
-            const lastSpin = userData.lastSpinTimestamp || 0; 
-            const now = Date.now(); 
-            const oneDay = 24 * 60 * 60 * 1000;
-            
-            if (now - lastSpin < oneDay) {
-                spinBtn.classList.add('hidden'); 
-                wheelCountdown.classList.remove('hidden');
-                
-                if (countdownInterval) clearInterval(countdownInterval);
-                
-                countdownInterval = setInterval(() => {
-                    const remaining = oneDay - (Date.now() - lastSpin);
-                    if (remaining <= 0) {
-                        clearInterval(countdownInterval); 
-                        wheelCountdown.classList.add('hidden'); 
-                        spinBtn.classList.remove('hidden', 'btn-disabled'); 
-                        spinBtn.disabled = false;
-                    } else {
-                        const h = Math.floor(remaining / 3600000), m = Math.floor((remaining % 3600000) / 60000), s = Math.floor((remaining % 60000) / 1000);
-                        wheelCountdown.textContent = `Sonraki hak: ${h}s ${m}d ${s}s`;
-                    }
-                }, 1000);
-            } else {
-                if (countdownInterval) clearInterval(countdownInterval);
-                wheelCountdown.classList.add('hidden'); 
-                spinBtn.classList.remove('hidden', 'btn-disabled'); 
-                spinBtn.disabled = false;
-            }
-        }
-
-        async function spinWheel() {
-            spinBtn.disabled = true; spinBtn.classList.add('btn-disabled');
-            
-            const prizeIndex = Math.floor(Math.random() * wheelPrizes.length); 
-            const prize = wheelPrizes[prizeIndex];
-            
-            // Çarkın hedef açısı
-            const targetRotation = (360 - (prizeIndex * sliceAngle)) - (sliceAngle / 2);
-            // Birden fazla tam tur atmasını sağlayarak dramatikleştir
-            const totalRotation = (360 * (Math.floor(Math.random() * 5) + 5)) + targetRotation;
-            
-            wheel.style.transform = `rotate(${totalRotation}deg)`;
-            
-            setTimeout(async () => {
-                showAlert('Tebrikler!', `${prize} TL kazandınız! Bakiye güncellendi.`);
-                
-                const userRef = doc(db, "users", currentUser.uid);
-                await runTransaction(db, async (transaction) => {
-                    const sfDoc = await transaction.get(userRef); 
-                    if (!sfDoc.exists()) throw "User does not exist!";
-                    transaction.update(userRef, { points: (sfDoc.data().points || 0) + prize, lastSpinTimestamp: Date.now() });
-                });
-                
-                // Animasyonu sıfırla ve yeniden etkinleştir
-                wheel.style.transition = 'none'; 
-                wheel.style.transform = `rotate(${targetRotation}deg)`;
-                setTimeout(() => { wheel.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)'; }, 50);
-                
-                checkSpinAvailability();
-            }, 5200); // Animasyon süresinden biraz daha uzun
-        }
-
-        // --- REFERANS MANTIĞI ---
         async function showReferralModal() {
              if (!currentUserData) {
                  showAlert('Bekleniyor', 'Kullanıcı verileri yükleniyor, lütfen kısa süre bekleyin.');
@@ -1587,13 +1517,93 @@
              referralCodeDisplay.value = currentUserData.referralCode || 'Kod oluşturuluyor...';
              totalReferralEarningsDisplay.textContent = `${(currentUserData.referralEarnings || 0).toFixed(2)} TL`;
              
-             // Davet edilen kullanıcı sayısını bul
              const q = query(collection(db, "users"), where("referrerId", "==", currentUser.uid));
              const querySnapshot = await getDocs(q);
              totalReferralsDisplay.textContent = querySnapshot.size;
              
              referralModal.classList.remove('hidden');
         }
+        
+        // --- İŞLEMLERİM SAYFASI ---
+        function listenToUserTasks(uid) {
+            if (unsubscribeUserTasks) unsubscribeUserTasks();
+            const q = query(collection(db, "userTasks"), where("userId", "==", uid));
+
+            unsubscribeUserTasks = onSnapshot(q, (snapshot) => {
+                const newUserTasks = new Map();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    newUserTasks.set(data.taskId, { id: doc.id, ...data });
+                });
+                userTasks = newUserTasks;
+                renderTransactionLists();
+                renderAllTasks();
+            });
+        }
+        
+        function renderTransactionLists() {
+            pendingTasksList.innerHTML = '';
+            completedTasksList.innerHTML = '';
+            let pendingCount = 0;
+            let completedCount = 0;
+            
+            const sortedTasks = [...userTasks.values()].sort((a,b) => (b.submittedAt || b.createdAt) - (a.submittedAt || a.createdAt));
+
+            sortedTasks.forEach(ut => {
+                if (ut.status === 'pending') {
+                    const item = document.createElement('div');
+                    item.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
+                    item.innerHTML = `
+                        <div>
+                            <p class="font-semibold text-white">${ut.taskTitle}</p>
+                            <p class="text-sm text-gray-400">Gönderildi: ${ut.submittedAt.toDate().toLocaleString()}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-lg text-green-400">${ut.taskPoints.toFixed(2)} TL</p>
+                            <p class="text-xs font-semibold px-2 py-1 bg-yellow-600 text-white rounded-full">Onay Bekliyor</p>
+                        </div>
+                    `;
+                    pendingTasksList.appendChild(item);
+                    pendingCount++;
+                } else if (ut.status === 'approved') {
+                    const item = document.createElement('div');
+                    item.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
+                    item.innerHTML = `
+                        <div>
+                            <p class="font-semibold text-white">${ut.taskTitle}</p>
+                            <p class="text-sm text-gray-400">Onaylandı: ${ut.approvedAt.toDate().toLocaleString()}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-lg text-green-400">+${ut.taskPoints.toFixed(2)} TL</p>
+                             <p class="text-xs font-semibold px-2 py-1 bg-green-600 text-white rounded-full">Onaylandı</p>
+                        </div>
+                    `;
+                    completedTasksList.appendChild(item);
+                    completedCount++;
+                }
+            });
+
+            if (pendingCount === 0) pendingTasksList.innerHTML = '<p class="text-center text-gray-400">Onay bekleyen göreviniz bulunmuyor.</p>';
+            if (completedCount === 0) completedTasksList.innerHTML = '<p class="text-center text-gray-400">Henüz tamamlanmış bir göreviniz yok.</p>';
+        }
+
+        pendingTasksTab.addEventListener('click', () => {
+            pendingTasksContent.classList.remove('hidden');
+            completedTasksContent.classList.add('hidden');
+            pendingTasksTab.classList.add('bg-indigo-600', 'text-white');
+            pendingTasksTab.classList.remove('text-gray-400');
+            completedTasksTab.classList.remove('bg-indigo-600', 'text-white');
+            completedTasksTab.classList.add('text-gray-400');
+        });
+
+        completedTasksTab.addEventListener('click', () => {
+            completedTasksContent.classList.remove('hidden');
+            pendingTasksContent.classList.add('hidden');
+            completedTasksTab.classList.add('bg-indigo-600', 'text-white');
+            completedTasksTab.classList.remove('text-gray-400');
+            pendingTasksTab.classList.remove('bg-indigo-600', 'text-white');
+            pendingTasksTab.classList.add('text-gray-400');
+        });
 
     </script>
 </body>
