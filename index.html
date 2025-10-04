@@ -522,10 +522,22 @@
                         
                         try {
                             await completeTask(taskId, currentUser.uid);
-                            showModal('Başarılı!', 'Göreviniz başarıyla tamamlandı ve bakiyeniz güncellendi.', true, 'Tamam');
+                            const completedCard = document.getElementById(`task-card-${taskId}`);
+                            if (completedCard) {
+                                completedCard.remove();
+                            }
+                            hideModal();
                         } catch (error) {
                             console.error("Görevi tamamlarken hata oluştu: ", error);
-                            showModal('Hata', error.message, true, 'Tamam');
+                            if (error.message.includes("zaten tamamladınız")) {
+                                const completedCard = document.getElementById(`task-card-${taskId}`);
+                                if (completedCard) {
+                                    completedCard.remove();
+                                }
+                                hideModal();
+                            } else {
+                                showModal('Hata', error.message, true, 'Tamam');
+                            }
                         } finally {
                             // İşlem bittiğinde görevi işlenenler listesinden çıkar
                             const index = tasksBeingProcessed.indexOf(taskId);
@@ -803,6 +815,7 @@
                 const isLimitReached = task.completedCount >= task.limit;
                 
                 const card = document.createElement('div');
+                card.id = `task-card-${task.id}`;
                 card.className = `task-card p-6 rounded-lg shadow-lg flex flex-col justify-between ${task.isFeatured ? 'featured-card' : ''}`;
                 
                 let buttonHtml = '';
@@ -1269,4 +1282,5 @@
     </script>
 </body>
 </html>
+
 
